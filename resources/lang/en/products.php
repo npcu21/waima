@@ -1,0 +1,20 @@
+<?php
+return [
+    'id' => 'ID',
+    'title' => 'Title',
+    'Typeoffeed' => 'Raw materials (inputs used in animal feed production)',
+    'afrm' => 'Raw materials (inputs used in the production of animal feed)',
+    'afPhysicalform' => 'Physical form (granules, flour, crumbs)',
+    'afdm' => '% Dry Matter (DM)',
+    'afEnergy' => '% Energy (UF, kcal)',
+    'afcp' => '% Crude Protein',
+    'afsp' => 'Shelf Life',
+    'affs' => 'Feed Supplements',
+    'afWholesalePrice' => 'Average Wholesale Prices by Packaging Type',
+    'afsemiwholesalePrice' => 'Average Semi-Wholesale Prices by Packaging Type',
+    'afretailPrice' => 'Average Retail Prices by Packaging Type',
+    'qr_code_path' => 'QR Code',
+    'status_id' => 'Status',
+    'supplier' => 'Supplier',
+    'action' => 'Action',
+];

@@ -1,0 +1,86 @@
+<?php
+
+return [
+
+    // Page Titles
+    'add_agent' => 'Add Agent',
+   'active' => 'Active',            // French
+   'Pending'  => 'Pending',
+    'Approved' => 'Approved',
+    'Deny'     => 'Deny',
+    'Active'   => 'Active',
+    'Inactive' => 'Inactive',
+    'status'   => 'Status',
+    // Labels
+    'name' => 'Name',
+    'email' => 'Email',
+    'password' => 'Password',
+    'country' => 'Country',
+    'region' => 'Region',
+
+    // Placeholders
+    'enter_name' => 'Enter Name',
+    'enter_email' => 'Enter Email',
+    'enter_password' => 'Enter Password',
+
+    // Drop-down Placeholders
+    'select_country' => 'Select Country',
+    'select_regions' => 'Select Regions',
+    'no_regions' => 'No regions available',
+
+    // Button
+    'create_agent' => 'Create Agent',
+
+    'edit_agent'       => 'Edit Agent',
+    'name'             => 'Name',
+    'email'            => 'Email',
+    'username'         => 'Username',
+    'password_optional'=> 'Password (Leave blank if unchanged)',
+    'country'          => 'Country',
+    'select_country'   => 'Select Country',
+    'region'           => 'Region',
+    'select_regions'   => 'Select Regions',
+    'status'           => 'Status',
+    'update_agent'     => 'Update Agent',
+
+       'filter_agent_list'      => 'Filter Agent List',
+    'select_country'         => '-- Select Country --',
+    'filter'                 => 'Filter',
+    'reset'                  => 'Reset',
+    'agent_list'             => 'Agent List',
+    'add_agent'              => 'Add Agent',
+    'id'                     => 'ID',
+    'name'                   => 'Name',
+    'email'                  => 'Email',
+    'username'               => 'Username',
+    'status'                 => 'Status',
+    'created_at'             => 'Created At',
+    'action'                 => 'Action',
+    'approve'                => 'Approve',
+    'denied'                 => 'Denied',
+    'edit'                   => 'Edit',
+    'view'                   => 'View',
+    'delete'                 => 'Delete',
+    'delete_confirm'         => 'Are you sure you want to delete this agent?',
+    'reject_agent'           => 'Reject Agent:',
+    'reason_for_rejection'   => 'Reason for Rejection',
+    'close'                  => 'Close',
+    'reject_button'          => 'Denied',
+    'no_agents_found'        => 'No Agents Found',
+    'Pending'                => 'Pending',
+    'Approved'               => 'Approved',
+    'Denied'                 => 'Denied',
+      'agent_details' => 'Agent Details',
+    'agent_id'      => 'Agent ID',
+    'full_name'     => 'Full Name',
+    'email'         => 'Email Address',
+    'username'      => 'Username',
+    'country'       => 'Country',
+    'status'        => 'Status',
+    'created_at'    => 'Created At',
+    'profile_image' => 'Profile Image',
+    'back_list'     => 'Back to Agent List',
+    'update_agent'  => 'Update Agent',
+    'pending'       => 'Pending',
+    'n_a'           => 'N/A',
+];

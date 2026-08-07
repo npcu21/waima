@@ -1,0 +1,160 @@
+@extends('admin.layouts.app')
+
+@section('title', 'Master Admin Registration')
+
+@section('content')
+
+<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+
+<div class="container-fluid p-0">
+
+    <!-- Navbar -->
+
+ <!-- Navbar -->
+    @include('includes.navbar')
+
+    <!-- Page Heading -->
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Administrator</h2>
+
+        <!-- Success / Error Messages -->
+        @if(session('message'))
+            <div class="alert alert-success">{{ session('message') }}</div>
+        @endif
+
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+<!-- Registration Form -->
+<form action="{{ route('masteradmin.register') }}" method="POST" class="card p-4 col-md-6 mx-auto shadow">
+    @csrf
+
+    <div class="mb-3">
+        <label>Name</label>
+        <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
+    </div>
+
+    <!-- Phone -->
+    <div class="mb-3">
+        <label>Phone</label>
+        <input type="text" name="phone" class="form-control" value="{{ old('phone') }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label>Confirm Password</label>
+        <input type="password" name="password_confirmation" class="form-control" required>
+    </div>
+      <!-- <div class="mb-3">
+        <label>Country</label>
+        <select name="country_id" class="form-control" >
+            <option value="">Select Country</option>
+            @foreach($countries as $country)
+                <option value="{{ $country->id }}" {{ old('country_id') == $country->id ? 'selected' : '' }}>
+                    {{ $country->name }}
+                </option>
+            @endforeach
+        </select>
+    </div> -->
+
+    <!-- <div class="mb-3">
+        <label>Country</label>
+        <select name="country_id" class="form-control" >
+            <option value="">Select Country</option>
+            @foreach($countries as $country)
+                <option value="{{ $country->id }}" {{ old('country_id') == $country->id ? 'selected' : '' }}>
+                    {{ $country->name }}
+                </option>
+            @endforeach
+        </select>
+    </div> -->
+    <!-- Main select: Country or Region -->
+<div class="mb-3">
+    <label>Type</label>
+    <select name="type_select" id="type_select" class="form-control" required>
+        <option value="">Select Type</option>
+        <option value="country" {{ old('type_select') == 'country' ? 'selected' : '' }}>Country</option>
+        <option value="region" {{ old('type_select') == 'region' ? 'selected' : '' }}>Region</option>
+    </select>
+</div>
+
+<!-- Country dropdown (shown only if Country selected) -->
+<div class="mb-3" id="country_dropdown" style="display: none;">
+    <label>Country</label>
+    <select name="country_id" class="form-control">
+        <option value="">Select Country</option>
+        @foreach($countries as $country)
+            <option value="{{ $country->id }}" {{ old('country_id') == $country->id ? 'selected' : '' }}>
+                {{ $country->name }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
+    <div class="d-grid mt-3">
+        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2">Register</button>
+    </div>
+</form>
+</div>
+
+
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    h2 {
+        font-weight: 600;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    @media (max-width: 767px) {
+        .card {
+            padding: 20px;
+        }
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const typeSelect = document.getElementById('type_select');
+        const countryDropdown = document.getElementById('country_dropdown');
+
+        function toggleCountryDropdown() {
+            if (typeSelect.value === 'country') {
+                countryDropdown.style.display = 'block';
+            } else {
+                countryDropdown.style.display = 'none';
+            }
+        }
+
+        // Run on page load in case old value exists
+        toggleCountryDropdown();
+
+        // Run on change
+        typeSelect.addEventListener('change', toggleCountryDropdown);
+    });
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+@endsection
+

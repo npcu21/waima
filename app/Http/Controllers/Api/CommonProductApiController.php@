@@ -1,0 +1,3425 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Stichoza\GoogleTranslate\GoogleTranslate;
+use Exception;
+use App\Models\SeedForm;
+use App\Models\AnimalFeed;
+use App\Models\BioStimulant;
+use App\Models\Language;
+use App\Models\Notification;
+use App\Models\AnimalFeedTranslation;
+use App\Models\InorganicSoilConditioner;
+use App\Models\InorganicSoilConditionerTranslation;
+use App\Models\MineralFertilizer;
+use App\Models\OrganicAmendment;
+use App\Models\SyntheticPesticide;
+use App\Models\VeterinaryProduct;
+use App\Models\AllProduct; 
+use App\Models\ProductLike;
+
+// use SimpleSoftwareIO\QrCode\Facades\QrCode;
+// ✅ Import AllProduct
+use Illuminate\Support\Facades\DB;  // ✅ Add this line
+use Illuminate\Support\Facades\Schema;
+
+class CommonProductApiController extends Controller
+{
+    
+
+public function store(Request $request)
+{
+    $productId = $request->input('product_id');
+    $recordId = $request->input('id'); // check if update request
+
+    if (!$productId) {
+        return response()->json([
+            'status' => false,
+            'message' => 'product_id is required.'
+        ], 400);
+    }
+
+    try {
+        switch ($productId) {
+            case 8: // Seed Forms
+                $savedData = $this->storeSeedForm($request, $recordId);
+                break;
+            case 2: // Animal Feeds
+                $savedData = $this->storeAnimalFeed($request, $recordId);
+                break;
+            case 5: // Bio Stimulants
+                $savedData = $this->storeBioStimulant($request, $recordId);
+                break;
+            case 4: // Inorganic Soil Conditioners
+                $savedData = $this->storeInorganicSoilConditioner($request, $recordId);
+                break;
+            case 7: // Mineral Fertilizers
+                $savedData = $this->storeMineralFertilizer($request, $recordId);
+                break;
+            case 6: // Organic Amendments
+                $savedData = $this->storeOrganicAmendment($request, $recordId);
+                break;
+            case 3: // Synthetic Pesticides
+                $savedData = $this->storeSyntheticPesticide($request, $recordId);
+                break;
+            case 1: // Veterinary Products
+                $savedData = $this->storeVeterinaryProduct($request, $recordId);
+                break;
+            default:
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Invalid product_id.'
+                ], 400);
+        }
+
+        if ($savedData instanceof \Illuminate\Http\JsonResponse) {
+            $json = $savedData->getData(true);
+            $savedData = $json['data'] ?? null;
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => $recordId ? 'Data updated successfully.' : 'Data saved successfully.',
+            'product_id' => $productId,
+            'id' => $savedData->id ?? null,
+            'data' => $savedData
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Error saving/updating data.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+    
+
+
+private function storeSeedForm(Request $request, $id = null)
+{
+    // ----------------- VALIDATION -----------------
+    $validated = $request->validate([
+        'product_id' => 'nullable|integer',
+        'cropName' => 'required|string|max:255',
+        'verityName' => 'required|string|max:255',
+        'breederName' => 'nullable|string|max:255',
+        'countryOrigin' => 'nullable|string|max:255',
+        'registrationNumber' => 'required|string|max:255',
+        'varietyType' => 'nullable|string|max:255',
+        'seedCategory' => 'nullable|string|max:255',
+        'precocity' => 'nullable|string|max:255',
+        'fruitColor' => 'nullable|string|max:255',
+        'fruitShape' => 'nullable|string|max:255',
+        'leafLength' => 'nullable|string|max:255',
+        'leafColor' => 'nullable|string|max:255',
+        'plantHeight' => 'nullable|string|max:255',
+        'plantHabit' => 'nullable|string|max:255',
+        'bioticResistance' => 'nullable|string|max:255',
+        'abioticResistance' => 'nullable|string|max:255',
+        'InherentNutritionalValue' => 'nullable|array',
+        'other' => 'nullable|string',
+        'yield' => 'nullable|string',
+        'otherRecommendations' => 'nullable|string',
+        'wholesalePrice' => 'nullable|numeric',
+        'semiwholesalePrice' => 'nullable|numeric',
+        'retailPrice' => 'nullable|numeric',
+        'supplier_id' => 'nullable|integer',
+        'agent_id' => 'nullable|integer',
+        'created_by' => 'nullable|integer',
+        'status_id' => 'nullable|integer',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        'otherRecommendationsPhoto' => 'nullable',
+    ]);
+
+    // ----------------- DEFAULT VALUES -----------------
+    // $validated['status_id'] = $request->input('status_id', 1);
+    $validated['agent_id'] = $request->input('agent_id', 1);
+    $validated['language_id'] = 1;
+    $validated['form_type'] = 'seed_form';
+    $validated['InherentNutritionalValue'] = json_encode($validated['InherentNutritionalValue'] ?? []);
+    $validated['product_id'] = $request->input('product_id');
+    $userId = $request->input('created_by', Auth::id() ?? 1);
+    
+
+    if ($request->filled('supplier_id')) {
+    // Supplier आया → Status 1
+    $validated['status_id'] = 1;
+} elseif ($request->filled('agent_id') && !$request->filled('supplier_id')) {
+    // Sirf Agent आया → Status 4
+    $validated['status_id'] = 4;
+} else {
+    $validated['status_id'] = 1; // Default
+}
+
+    // ----------------- UPDATE MODE -----------------
+    if ($id) {
+        $seedForm = SeedForm::find($id);
+
+        if (!$seedForm) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Seed form not found.'
+            ], 404);
+        }
+
+        // ⭐ Store old prices in price_histories
+        \DB::table('price_histories')->insert([
+            'product_id'         => $seedForm->product_id,
+            'supplier_id'        => $seedForm->supplier_id,
+            'wholesalePrice'     => $seedForm->wholesalePrice,
+            'semiwholesalePrice' => $seedForm->semiwholesalePrice,
+            'retailPrice'        => $seedForm->retailPrice,
+            'updated_by'         => $userId,
+            'add_product_id'     => $seedForm->id,
+            'changed_at'         => now(),
+            'created_at'         => now(),
+            'updated_at'         => now(),
+        ]);
+
+        // Update main table
+        $seedForm->update($validated);
+
+        $message = 'Seed form updated successfully, price history saved.';
+    } else {
+        // ----------------- CREATE MODE -----------------
+        $seedForm = SeedForm::create($validated);
+        Notification::create([
+    'title'   => 'New Product Added',
+    'message' => "Add porduct {$request->cropName} - {$request->verityName} has been added.",
+    'is_read' => 0,
+]);
+
+        // ⭐ First price log
+        \DB::table('price_histories')->insert([
+            'product_id'         => $seedForm->product_id,
+            'supplier_id'        => $seedForm->supplier_id,
+            'wholesalePrice'     => $seedForm->wholesalePrice,
+            'semiwholesalePrice' => $seedForm->semiwholesalePrice,
+            'retailPrice'        => $seedForm->retailPrice,
+            'updated_by'         => $userId,
+            'add_product_id'     => $seedForm->id,
+            'changed_at'         => now(),
+            'created_at'         => now(),
+            'updated_at'         => now(),
+        ]);
+
+        $message = 'Seed form created successfully, price history saved.';
+    }
+
+    // ----------------- QR CODE GENERATION -----------------
+    include_once(public_path('phpqrcode/qrlib.php'));
+    $qrFolder = public_path('qrcodes');
+    if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+    $qrFileName = 'seedform_' . $seedForm->id . '.png';
+    \QRcode::png(url('/seed-form/' . $seedForm->id), $qrFolder . '/' . $qrFileName, 'L', 4, 2);
+
+    $seedForm->qr_code_path = 'qrcodes/' . $qrFileName;
+    $seedForm->save();
+
+    return response()->json([
+        'status' => true,
+        'message' => $message,
+        'data' => $seedForm
+    ], $id ? 200 : 201);
+}
+
+// private function storeSeedForm(Request $request, $id = null)
+// {
+//     // ----------------- VALIDATION -----------------
+//     $validated = $request->validate([
+//         'product_id' => 'nullable|integer',
+//         'cropName' => 'required|string|max:255',
+//         'verityName' => 'required|string|max:255',
+//         'breederName' => 'nullable|string|max:255',
+//         'countryOrigin' => 'nullable|string|max:255',
+//         'registrationNumber' => 'required|string|max:255',
+//         'varietyType' => 'nullable|string|max:255',
+//         'seedCategory' => 'nullable|string|max:255',
+//         'precocity' => 'nullable|string|max:255',
+//         'fruitColor' => 'nullable|string|max:255',
+//         'fruitShape' => 'nullable|string|max:255',
+//         'leafLength' => 'nullable|string|max:255',
+//         'leafColor' => 'nullable|string|max:255',
+//         'plantHeight' => 'nullable|string|max:255',
+//         'plantHabit' => 'nullable|string|max:255',
+//         'bioticResistance' => 'nullable|string|max:255',
+//         'abioticResistance' => 'nullable|string|max:255',
+//         'InherentNutritionalValue' => 'nullable|array',
+//         'other' => 'nullable|string',
+//         'yield' => 'nullable|string',
+//         'otherRecommendations' => 'nullable|string',
+//         'wholesalePrice' => 'nullable|numeric',
+//         'semiwholesalePrice' => 'nullable|numeric',
+//         'retailPrice' => 'nullable|numeric',
+//         'supplier_id' => 'nullable|integer',
+//         'agent_id' => 'nullable|integer',
+//         'created_by' => 'nullable|integer',
+//         'status_id' => 'nullable|integer',
+//         'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+//         'otherRecommendationsPhoto' => 'nullable',
+//     ]);
+
+//     // ----------------- DEFAULT VALUES -----------------
+//     $validated['status_id'] = $request->input('status_id', 1);
+//     $validated['agent_id'] = $request->input('agent_id', 1);
+//     $validated['language_id'] = 1;
+//     $validated['form_type'] = 'seed_form';
+//     $validated['InherentNutritionalValue'] = json_encode($validated['InherentNutritionalValue'] ?? []);
+//     $validated['product_id'] = $request->input('product_id');
+//     $userId = $request->input('created_by', Auth::id() ?? 1);
+
+//     // ----------------- UPDATE MODE -----------------
+//     if ($id) {
+//         $seedForm = SeedForm::find($id);
+
+//         if (!$seedForm) {
+//             return response()->json([
+//                 'status' => false,
+//                 'message' => 'Seed form not found.'
+//             ], 404);
+//         }
+
+//         // ⭐ Store old prices in price_histories
+//         \DB::table('price_histories')->insert([
+//             'product_id'         => $seedForm->product_id,
+//             'supplier_id'        => $seedForm->supplier_id,
+//             'wholesalePrice'     => $seedForm->wholesalePrice,
+//             'semiwholesalePrice' => $seedForm->semiwholesalePrice,
+//             'retailPrice'        => $seedForm->retailPrice,
+//             'updated_by'         => $userId,
+//             'add_product_id'     => $seedForm->id,
+//             'changed_at'         => now(),
+//             'created_at'         => now(),
+//             'updated_at'         => now(),
+//         ]);
+
+//         // Update main table
+//         $seedForm->update($validated);
+
+//         $message = 'Seed form updated successfully, price history saved.';
+//     } else {
+//         // ----------------- CREATE MODE -----------------
+//         $seedForm = SeedForm::create($validated);
+//   
+
+//         // ⭐ First price log
+//         \DB::table('price_histories')->insert([
+//             'product_id'         => $seedForm->product_id,
+//             'supplier_id'        => $seedForm->supplier_id,
+//             'wholesalePrice'     => $seedForm->wholesalePrice,
+//             'semiwholesalePrice' => $seedForm->semiwholesalePrice,
+//             'retailPrice'        => $seedForm->retailPrice,
+//             'updated_by'         => $userId,
+//             'add_product_id'     => $seedForm->id,
+//             'changed_at'         => now(),
+//             'created_at'         => now(),
+//             'updated_at'         => now(),
+//         ]);
+
+//         $message = 'Seed form created successfully, price history saved.';
+//     }
+
+//     // ----------------- QR CODE GENERATION -----------------
+//     include_once(public_path('phpqrcode/qrlib.php'));
+//     $qrFolder = public_path('qrcodes');
+//     if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+//     $qrFileName = 'seedform_' . $seedForm->id . '.png';
+//     \QRcode::png(url('/seed-form/' . $seedForm->id), $qrFolder . '/' . $qrFileName, 'L', 4, 2);
+
+//     $seedForm->qr_code_path = 'qrcodes/' . $qrFileName;
+//     $seedForm->save();
+
+//     return response()->json([
+//         'status' => true,
+//         'message' => $message,
+//         'data' => $seedForm
+//     ], $id ? 200 : 201);
+// }
+
+
+
+
+
+
+private function storeAnimalFeed(Request $request, $id = null)
+{
+    // ✅ Validation
+    $validated = $request->validate([
+        'product_id' => 'nullable|integer',
+        'Typeoffeed' => 'nullable|string|max:255',
+        'title' => 'nullable|string|max:255',
+        'afrm' => 'nullable|string|max:255',
+        'afPhysicalform' => 'nullable|string|max:255',
+        'afdm' => 'nullable|string|max:255',
+        'afEnergy' => 'nullable|string|max:255',
+        'afcp' => 'nullable|string|max:255',
+        'afsp' => 'nullable|string|max:255',
+        'affs' => 'nullable|string|max:255',
+        'afWholesalePrice' => 'nullable|numeric',
+        'afsemiwholesalePrice' => 'nullable|numeric',
+        'afretailPrice' => 'nullable|numeric',
+        'supplier_id' => 'nullable|integer',
+        'agent_id' => 'nullable|integer',
+        'created_by' => 'nullable|integer',
+        'status_id' => 'nullable|integer'
+    ]);
+
+    // ⭐ DEFAULT VALUES
+    // $validated['status_id'] = $request->input('status_id', 1);
+    $validated['agent_id'] = $request->input('agent_id', 1);
+    $validated['language_id'] = 1;
+    $validated['form_type'] = 'animal_feed';
+    $validated['product_id'] = $request->input('product_id');
+    $userId = $request->input('created_by', Auth::id() ?? 1);
+
+
+     if ($request->filled('supplier_id')) {
+    // Supplier आया → Status 1
+    $validated['status_id'] = 1;
+} elseif ($request->filled('agent_id') && !$request->filled('supplier_id')) {
+    // Sirf Agent आया → Status 4
+    $validated['status_id'] = 4;
+} else {
+    $validated['status_id'] = 1; // Default
+}
+
+    // ======================================================
+    //            UPDATE MODE
+    // ======================================================
+    if ($id) {
+        $animalFeed = AnimalFeed::find($id);
+
+        if (!$animalFeed) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Animal feed record not found.'
+            ], 404);
+        }
+
+        // 🔹 Store old prices in price_histories
+        \DB::table('price_histories')->insert([
+            'product_id'         => $animalFeed->product_id,
+            'supplier_id'        => $animalFeed->supplier_id,
+            'wholesalePrice'     => $animalFeed->afWholesalePrice,
+            'semiwholesalePrice' => $animalFeed->afsemiwholesalePrice,
+            'retailPrice'        => $animalFeed->afretailPrice,
+            'updated_by'         => $userId,
+            'add_product_id'     => $animalFeed->id,
+            'changed_at'         => now(),
+            'created_at'         => now(),
+            'updated_at'         => now(),
+        ]);
+
+        // Update AnimalFeed table
+        $animalFeed->update($validated);
+
+        $message = 'Animal feed updated successfully, price history saved.';
+    } else {
+        // ======================================================
+        //            CREATE MODE
+        // ======================================================
+        $animalFeed = AnimalFeed::create($validated);
+        Notification::create([
+    'title'   => 'New Animal Feed Added',
+    'message' => "Animal Feed {$request->title} has been added.",
+    'is_read' => 0,
+]);
+
+        // 🔹 Save initial prices in price_histories
+        \DB::table('price_histories')->insert([
+            'product_id'         => $animalFeed->product_id,
+            'supplier_id'        => $animalFeed->supplier_id,
+            'wholesalePrice'     => $animalFeed->afWholesalePrice,
+            'semiwholesalePrice' => $animalFeed->afsemiwholesalePrice,
+            'retailPrice'        => $animalFeed->afretailPrice,
+            'updated_by'         => $userId,
+            'add_product_id'     => $animalFeed->id,
+            'changed_at'         => now(),
+            'created_at'         => now(),
+            'updated_at'         => now(),
+        ]);
+
+        $message = 'Animal feed created successfully, price history saved.';
+    }
+
+    // ======================================================
+    //            QR CODE GENERATION
+    // ======================================================
+    include_once(public_path('phpqrcode/qrlib.php'));
+    $qrFolder = public_path('qrcodes');
+    if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+    $qrFileName = 'animalfeed_' . $animalFeed->id . '.png';
+    \QRcode::png(url('/animalfeed/' . $animalFeed->id), $qrFolder . '/' . $qrFileName, 'L', 4, 2);
+
+    $animalFeed->qr_code_path = 'qrcodes/' . $qrFileName;
+    $animalFeed->save();
+
+    return response()->json([
+        'status' => true,
+        'message' => $message,
+        'data' => $animalFeed
+    ], $id ? 200 : 201);
+}
+// private function storeAnimalFeed(Request $request, $id = null)
+// {
+//     // ✅ Validation
+//     $validated = $request->validate([
+//         'product_id' => 'nullable|integer',
+//         'Typeoffeed' => 'nullable|string|max:255',
+//         'title' => 'nullable|string|max:255',
+//         'afrm' => 'nullable|string|max:255',
+//         'afPhysicalform' => 'nullable|string|max:255',
+//         'afdm' => 'nullable|string|max:255',
+//         'afEnergy' => 'nullable|string|max:255',
+//         'afcp' => 'nullable|string|max:255',
+//         'afsp' => 'nullable|string|max:255',
+//         'affs' => 'nullable|string|max:255',
+//         'afWholesalePrice' => 'nullable|numeric',
+//         'afsemiwholesalePrice' => 'nullable|numeric',
+//         'afretailPrice' => 'nullable|numeric',
+//         'supplier_id' => 'nullable|integer',
+//         'agent_id' => 'nullable|integer',
+//         'created_by' => 'nullable|integer',
+//         'status_id' => 'nullable|integer'
+//     ]);
+
+//     // ⭐ DEFAULT VALUES
+//     $validated['status_id'] = $request->input('status_id', 1);
+//     $validated['agent_id'] = $request->input('agent_id', 1);
+//     $validated['language_id'] = 1;
+//     $validated['form_type'] = 'animal_feed';
+//     $validated['product_id'] = $request->input('product_id');
+//     $userId = $request->input('created_by', Auth::id() ?? 1);
+
+//     // ======================================================
+//     //            UPDATE MODE
+//     // ======================================================
+//     if ($id) {
+//         $animalFeed = AnimalFeed::find($id);
+
+//         if (!$animalFeed) {
+//             return response()->json([
+//                 'status' => false,
+//                 'message' => 'Animal feed record not found.'
+//             ], 404);
+//         }
+
+//         // 🔹 Store old prices in price_histories
+//         \DB::table('price_histories')->insert([
+//             'product_id'         => $animalFeed->product_id,
+//             'supplier_id'        => $animalFeed->supplier_id,
+//             'wholesalePrice'     => $animalFeed->afWholesalePrice,
+//             'semiwholesalePrice' => $animalFeed->afsemiwholesalePrice,
+//             'retailPrice'        => $animalFeed->afretailPrice,
+//             'updated_by'         => $userId,
+//             'add_product_id'     => $animalFeed->id,
+//             'changed_at'         => now(),
+//             'created_at'         => now(),
+//             'updated_at'         => now(),
+//         ]);
+
+//         // Update AnimalFeed table
+//         $animalFeed->update($validated);
+
+//         $message = 'Animal feed updated successfully, price history saved.';
+//     } else {
+//         // ======================================================
+//         //            CREATE MODE
+//         // ======================================================
+//         $animalFeed = AnimalFeed::create($validated);
+        
+
+//         // 🔹 Save initial prices in price_histories
+//         \DB::table('price_histories')->insert([
+//             'product_id'         => $animalFeed->product_id,
+//             'supplier_id'        => $animalFeed->supplier_id,
+//             'wholesalePrice'     => $animalFeed->afWholesalePrice,
+//             'semiwholesalePrice' => $animalFeed->afsemiwholesalePrice,
+//             'retailPrice'        => $animalFeed->afretailPrice,
+//             'updated_by'         => $userId,
+//             'add_product_id'     => $animalFeed->id,
+//             'changed_at'         => now(),
+//             'created_at'         => now(),
+//             'updated_at'         => now(),
+//         ]);
+
+//         $message = 'Animal feed created successfully, price history saved.';
+//     }
+
+//     // ======================================================
+//     //            QR CODE GENERATION
+//     // ======================================================
+//     include_once(public_path('phpqrcode/qrlib.php'));
+//     $qrFolder = public_path('qrcodes');
+//     if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+//     $qrFileName = 'animalfeed_' . $animalFeed->id . '.png';
+//     \QRcode::png(url('/animalfeed/' . $animalFeed->id), $qrFolder . '/' . $qrFileName, 'L', 4, 2);
+
+//     $animalFeed->qr_code_path = 'qrcodes/' . $qrFileName;
+//     $animalFeed->save();
+
+//     return response()->json([
+//         'status' => true,
+//         'message' => $message,
+//         'data' => $animalFeed
+//     ], $id ? 200 : 201);
+// }
+
+
+
+private function storeBioStimulant(Request $request, $id = null)
+{
+    // ✅ Validate input
+    $validator = Validator::make($request->all(), [
+        'product_id' => 'nullable|integer',
+        'trade_name' => 'required|string|max:255',
+        'physical_form' => 'required|string|max:50',
+        'biostimulant_product' => 'required|string|max:100',
+        're_registration' => 'required|string|max:255',
+        'n' => 'nullable|numeric',
+        'p2' => 'nullable|numeric',
+        'k2' => 'nullable|numeric',
+        'zn' => 'nullable|numeric',
+        'ca' => 'nullable|numeric',
+        'mg' => 'nullable|numeric',
+        's' => 'nullable|numeric',
+        'b' => 'nullable|numeric',
+        'mo' => 'nullable|numeric',
+        'action_mode' => 'nullable|string|max:255',
+        'wholesale_price' => 'required|numeric',
+        'semiwholesale_price' => 'required|numeric',
+        'retail_price' => 'required|numeric',
+        'supplier_id' => 'nullable|integer',
+        'agent_id' => 'nullable|integer',
+        'language_id' => 'nullable|integer',
+        'status_id' => 'nullable|integer',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Validation Error.',
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $data = $request->all();
+    $data['created_by'] = Auth::id() ?? 1;
+    $data['language_id'] = $data['language_id'] ?? 1;
+    $data['form_type'] = 'bio_stimulant';
+    $data['product_id'] = $request->input('product_id');
+
+    // $data['status_id'] = $request->input('status_id', 1);
+    $data['agent_id'] = $request->input('agent_id', 1);
+
+
+
+     if ($request->filled('supplier_id')) {
+    // Supplier आया → Status 1
+    $validated['status_id'] = 1;
+} elseif ($request->filled('agent_id') && !$request->filled('supplier_id')) {
+    // Sirf Agent आया → Status 4
+    $validated['status_id'] = 4;
+} else {
+    $validated['status_id'] = 1; // Default
+}
+
+    // ======================================================
+    //            UPDATE MODE
+    // ======================================================
+    if ($id) {
+        $bioStimulant = BioStimulant::find($id);
+        if (!$bioStimulant) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Bio Stimulant record not found.'
+            ], 404);
+        }
+
+        // 🔹 Save old prices in price_histories
+        \DB::table('price_histories')->insert([
+            'product_id'         => $bioStimulant->product_id,
+            'supplier_id'        => $bioStimulant->supplier_id,
+            'wholesalePrice'     => $bioStimulant->wholesale_price,
+            'semiwholesalePrice' => $bioStimulant->semiwholesale_price,
+            'retailPrice'        => $bioStimulant->retail_price,
+            'updated_by'         => $request->input('updated_by', null),
+            'changed_at'         => now(),
+            'created_at'         => now(),
+            'updated_at'         => now(),
+        ]);
+
+        $bioStimulant->update($data);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Bio Stimulant updated successfully, price history saved.',
+            'data' => $bioStimulant
+        ]);
+    }
+
+    // ======================================================
+    //            CREATE MODE
+    // ======================================================
+    $bioStimulant = BioStimulant::create($data);
+    Notification::create([
+    'title'   => 'New Bio Stimulant Added',
+    'message' => "Bio Stimulant {$request->trade_name} has been added.",
+    'is_read' => 0,
+]);
+
+    // 🔹 Save initial prices in price_histories
+    \DB::table('price_histories')->insert([
+        'product_id'         => $bioStimulant->product_id,
+        'supplier_id'        => $bioStimulant->supplier_id,
+        'wholesalePrice'     => $bioStimulant->wholesale_price,
+        'semiwholesalePrice' => $bioStimulant->semiwholesale_price,
+        'retailPrice'        => $bioStimulant->retail_price,
+        'updated_by'         => $request->input('created_by', null),
+        'changed_at'         => now(),
+        'created_at'         => now(),
+        'updated_at'         => now(),
+    ]);
+
+    // ======================================================
+    //            QR CODE GENERATION
+    // ======================================================
+    include_once(public_path('phpqrcode/qrlib.php'));
+    $qrFolder = public_path('qrcodes');
+    if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+    $qrFileName = 'bio_' . $bioStimulant->id . '.png';
+    $url = url('/bio-stimulant/' . $bioStimulant->id);
+    \QRcode::png($url, $qrFolder . '/' . $qrFileName, 'L', 4, 2);
+
+    $bioStimulant->qr_code_path = 'qrcodes/' . $qrFileName;
+    $bioStimulant->save();
+
+    return $bioStimulant;
+}
+// private function storeBioStimulant(Request $request, $id = null)
+// {
+//     // ✅ Validate input
+//     $validator = Validator::make($request->all(), [
+//         'product_id' => 'nullable|integer',
+//         'trade_name' => 'required|string|max:255',
+//         'physical_form' => 'required|string|max:50',
+//         'biostimulant_product' => 'required|string|max:100',
+//         're_registration' => 'required|string|max:255',
+//         'n' => 'nullable|numeric',
+//         'p2' => 'nullable|numeric',
+//         'k2' => 'nullable|numeric',
+//         'zn' => 'nullable|numeric',
+//         'ca' => 'nullable|numeric',
+//         'mg' => 'nullable|numeric',
+//         's' => 'nullable|numeric',
+//         'b' => 'nullable|numeric',
+//         'mo' => 'nullable|numeric',
+//         'action_mode' => 'nullable|string|max:255',
+//         'wholesale_price' => 'required|numeric',
+//         'semiwholesale_price' => 'required|numeric',
+//         'retail_price' => 'required|numeric',
+//         'supplier_id' => 'nullable|integer',
+//         'agent_id' => 'nullable|integer',
+//         'language_id' => 'nullable|integer',
+//         'status_id' => 'nullable|integer',
+//     ]);
+
+//     if ($validator->fails()) {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Validation Error.',
+//             'errors' => $validator->errors()
+//         ], 422);
+//     }
+
+//     $data = $request->all();
+//     $data['created_by'] = Auth::id() ?? 1;
+//     $data['language_id'] = $data['language_id'] ?? 1;
+//     $data['form_type'] = 'bio_stimulant';
+//     $data['product_id'] = $request->input('product_id');
+
+//     $data['status_id'] = $request->input('status_id', 1);
+//     $data['agent_id'] = $request->input('agent_id', 1);
+
+//     // ======================================================
+//     //            UPDATE MODE
+//     // ======================================================
+//     if ($id) {
+//         $bioStimulant = BioStimulant::find($id);
+//         if (!$bioStimulant) {
+//             return response()->json([
+//                 'status' => false,
+//                 'message' => 'Bio Stimulant record not found.'
+//             ], 404);
+//         }
+
+//         // 🔹 Save old prices in price_histories
+//         \DB::table('price_histories')->insert([
+//             'product_id'         => $bioStimulant->product_id,
+//             'supplier_id'        => $bioStimulant->supplier_id,
+//             'wholesalePrice'     => $bioStimulant->wholesale_price,
+//             'semiwholesalePrice' => $bioStimulant->semiwholesale_price,
+//             'retailPrice'        => $bioStimulant->retail_price,
+//             'updated_by'         => $request->input('updated_by', null),
+//             'changed_at'         => now(),
+//             'created_at'         => now(),
+//             'updated_at'         => now(),
+//         ]);
+
+//         $bioStimulant->update($data);
+
+//         return response()->json([
+//             'status' => true,
+//             'message' => 'Bio Stimulant updated successfully, price history saved.',
+//             'data' => $bioStimulant
+//         ]);
+//     }
+
+//     // ======================================================
+//     //            CREATE MODE
+//     // ======================================================
+//     $bioStimulant = BioStimulant::create($data);
+
+//     // 🔹 Save initial prices in price_histories
+//     \DB::table('price_histories')->insert([
+//         'product_id'         => $bioStimulant->product_id,
+//         'supplier_id'        => $bioStimulant->supplier_id,
+//         'wholesalePrice'     => $bioStimulant->wholesale_price,
+//         'semiwholesalePrice' => $bioStimulant->semiwholesale_price,
+//         'retailPrice'        => $bioStimulant->retail_price,
+//         'updated_by'         => $request->input('created_by', null),
+//         'changed_at'         => now(),
+//         'created_at'         => now(),
+//         'updated_at'         => now(),
+//     ]);
+
+//     // ======================================================
+//     //            QR CODE GENERATION
+//     // ======================================================
+//     include_once(public_path('phpqrcode/qrlib.php'));
+//     $qrFolder = public_path('qrcodes');
+//     if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+//     $qrFileName = 'bio_' . $bioStimulant->id . '.png';
+//     $url = url('/bio-stimulant/' . $bioStimulant->id);
+//     \QRcode::png($url, $qrFolder . '/' . $qrFileName, 'L', 4, 2);
+
+//     $bioStimulant->qr_code_path = 'qrcodes/' . $qrFileName;
+//     $bioStimulant->save();
+
+//     return $bioStimulant;
+// }
+
+
+
+
+private function storeInorganicSoilConditioner(Request $request)
+{
+    // Map Postman keys to DB
+    if ($request->has('semi_wholesale_price')) {
+        $request->merge(['semiwholesale_price' => $request->input('semi_wholesale_price')]);
+    }
+    if ($request->has('other_raw_material')) {
+        $request->merge(['other' => $request->input('other_raw_material')]);
+    }
+
+    // Validate
+    $validated = $request->validate([
+        'id' => 'nullable|integer',
+        'product_id' => 'nullable|integer',
+        'conditioner_type' => 'required|string|max:255',
+        'physical_form' => 'required|string|max:50',
+        'trade_name' => 'required|string|max:255',
+        'raw_material' => 'nullable|string|max:255',
+        'other' => 'nullable|string|max:255',
+        'function' => 'nullable|string|max:255',
+        'wholesale_price' => 'required|numeric',
+        'semiwholesale_price' => 'required|numeric',
+        'retail_price' => 'required|numeric',
+        'supplier_id' => 'nullable|integer|exists:suppliers,id',
+        'agent_id' => 'nullable|integer|exists:agents,id',
+        'status_id' => 'nullable|integer',
+    ]);
+
+    $validated['created_by'] = Auth::id() ?? 1;
+    $validated['form_type'] = 'inorganic_soil_conditioner';
+    // $validated['status_id'] = $request->input('status_id', 1);
+    $validated['agent_id'] = $request->input('agent_id', 1);
+
+     if ($request->filled('supplier_id')) {
+    // Supplier आया → Status 1
+    $validated['status_id'] = 1;
+} elseif ($request->filled('agent_id') && !$request->filled('supplier_id')) {
+    // Sirf Agent आया → Status 4
+    $validated['status_id'] = 4;
+} else {
+    $validated['status_id'] = 1; // Default
+}
+
+
+    if ($request->filled('id')) {
+        // UPDATE CASE
+        $conditioner = InorganicSoilConditioner::find($request->id);
+        if (!$conditioner) {
+            return response()->json([
+                "status" => false,
+                "message" => "Record not found for update."
+            ], 404);
+        }
+
+        // 🔹 Save old prices to price_histories
+        \DB::table('price_histories')->insert([
+            'product_id' => $conditioner->product_id,
+            'supplier_id' => $conditioner->supplier_id,
+            'wholesalePrice' => $conditioner->wholesale_price,
+            'semiwholesalePrice' => $conditioner->semiwholesale_price,
+            'retailPrice' => $conditioner->retail_price,
+            'updated_by' => $validated['created_by'],
+            'add_product_id' => $conditioner->id,
+            'changed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $conditioner->update($validated);
+
+    } else {
+        // CREATE CASE
+        $conditioner = InorganicSoilConditioner::create($validated);
+           Notification::create([
+            'title'   => 'New Inorganic Soil Conditioner Added',
+            'message' => "Product {$request->trade_name} has been added.",
+            'is_read' => 0,
+        ]);
+
+        // 🔹 Save initial prices to price_histories
+        \DB::table('price_histories')->insert([
+            'product_id' => $conditioner->product_id,
+            'supplier_id' => $conditioner->supplier_id,
+            'wholesalePrice' => $conditioner->wholesale_price,
+            'semiwholesalePrice' => $conditioner->semiwholesale_price,
+            'retailPrice' => $conditioner->retail_price,
+            'updated_by' => $validated['created_by'],
+            'add_product_id' => $conditioner->id,
+            'changed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    // QR Code generation
+    include_once(public_path('phpqrcode/qrlib.php'));
+    $path = public_path('qrcodes');
+    if (!file_exists($path)) mkdir($path, 0755, true);
+    $file = 'inorganic_' . $conditioner->id . '.png';
+    \QRcode::png(url('/inorganic-soil-conditioner/' . $conditioner->id), $path . '/' . $file, 'L', 4, 2);
+
+    $conditioner->qr_code_path = 'qrcodes/' . $file;
+    $conditioner->save();
+
+    // Modify response keys
+    $response = $conditioner->toArray();
+    $response['semi_wholesale_price'] = $response['semiwholesale_price'];
+    $response['other_raw_material'] = $response['other'];
+    unset($response['semiwholesale_price'], $response['other']);
+
+    return response()->json([
+        "status" => true,
+        "message" => $request->filled('id')
+            ? "Inorganic Soil Conditioner updated successfully"
+            : "Inorganic Soil Conditioner saved successfully",
+        "data" => $response
+    ]);
+}
+
+// private function storeInorganicSoilConditioner(Request $request)
+// {
+//     // Map Postman keys to DB
+//     if ($request->has('semi_wholesale_price')) {
+//         $request->merge(['semiwholesale_price' => $request->input('semi_wholesale_price')]);
+//     }
+//     if ($request->has('other_raw_material')) {
+//         $request->merge(['other' => $request->input('other_raw_material')]);
+//     }
+
+//     // Validate
+//     $validated = $request->validate([
+//         'id' => 'nullable|integer',
+//         'product_id' => 'nullable|integer',
+//         'conditioner_type' => 'required|string|max:255',
+//         'physical_form' => 'required|string|max:50',
+//         'trade_name' => 'required|string|max:255',
+//         'raw_material' => 'nullable|string|max:255',
+//         'other' => 'nullable|string|max:255',
+//         'function' => 'nullable|string|max:255',
+//         'wholesale_price' => 'required|numeric',
+//         'semiwholesale_price' => 'required|numeric',
+//         'retail_price' => 'required|numeric',
+//         'supplier_id' => 'nullable|integer|exists:suppliers,id',
+//         'agent_id' => 'nullable|integer|exists:agents,id',
+//         'status_id' => 'nullable|integer',
+//     ]);
+
+//     $validated['created_by'] = Auth::id() ?? 1;
+//     $validated['form_type'] = 'inorganic_soil_conditioner';
+//     $validated['status_id'] = $request->input('status_id', 1);
+//     $validated['agent_id'] = $request->input('agent_id', 1);
+
+//     if ($request->filled('id')) {
+//         // UPDATE CASE
+//         $conditioner = InorganicSoilConditioner::find($request->id);
+//         if (!$conditioner) {
+//             return response()->json([
+//                 "status" => false,
+//                 "message" => "Record not found for update."
+//             ], 404);
+//         }
+
+//         // 🔹 Save old prices to price_histories
+//         \DB::table('price_histories')->insert([
+//             'product_id' => $conditioner->product_id,
+//             'supplier_id' => $conditioner->supplier_id,
+//             'wholesalePrice' => $conditioner->wholesale_price,
+//             'semiwholesalePrice' => $conditioner->semiwholesale_price,
+//             'retailPrice' => $conditioner->retail_price,
+//             'updated_by' => $validated['created_by'],
+//             'add_product_id' => $conditioner->id,
+//             'changed_at' => now(),
+//             'created_at' => now(),
+//             'updated_at' => now(),
+//         ]);
+
+//         $conditioner->update($validated);
+
+//     } else {
+//         // CREATE CASE
+//         $conditioner = InorganicSoilConditioner::create($validated);
+
+//         // 🔹 Save initial prices to price_histories
+//         \DB::table('price_histories')->insert([
+//             'product_id' => $conditioner->product_id,
+//             'supplier_id' => $conditioner->supplier_id,
+//             'wholesalePrice' => $conditioner->wholesale_price,
+//             'semiwholesalePrice' => $conditioner->semiwholesale_price,
+//             'retailPrice' => $conditioner->retail_price,
+//             'updated_by' => $validated['created_by'],
+//             'add_product_id' => $conditioner->id,
+//             'changed_at' => now(),
+//             'created_at' => now(),
+//             'updated_at' => now(),
+//         ]);
+//     }
+
+//     // QR Code generation
+//     include_once(public_path('phpqrcode/qrlib.php'));
+//     $path = public_path('qrcodes');
+//     if (!file_exists($path)) mkdir($path, 0755, true);
+//     $file = 'inorganic_' . $conditioner->id . '.png';
+//     \QRcode::png(url('/inorganic-soil-conditioner/' . $conditioner->id), $path . '/' . $file, 'L', 4, 2);
+
+//     $conditioner->qr_code_path = 'qrcodes/' . $file;
+//     $conditioner->save();
+
+//     // Modify response keys
+//     $response = $conditioner->toArray();
+//     $response['semi_wholesale_price'] = $response['semiwholesale_price'];
+//     $response['other_raw_material'] = $response['other'];
+//     unset($response['semiwholesale_price'], $response['other']);
+
+//     return response()->json([
+//         "status" => true,
+//         "message" => $request->filled('id')
+//             ? "Inorganic Soil Conditioner updated successfully"
+//             : "Inorganic Soil Conditioner saved successfully",
+//         "data" => $response
+//     ]);
+// }
+
+
+
+
+
+// private function storeMineralFertilizer(Request $request, $id = null)
+// {
+//     $validator = Validator::make($request->all(), [
+//         'product_id' => 'required|integer',
+//         'fertilizer_type' => 'required|string|max:255',
+//         'fertilizer_wholesale_price' => 'required|numeric',
+//         'fertilizer_semiwholesale_price' => 'required|numeric',
+//         'fertilizer_retail_price' => 'required|numeric',
+//         'title' => 'nullable|string|max:255',
+//         'form_type' => 'nullable|string|max:50',
+//         'supplier_id' => 'nullable|integer',
+//         'agent_id' => 'nullable|integer',
+//         'status_id' => 'nullable|integer', // 🔹 New
+//         'created_by' => 'nullable|integer',
+//         'language_id' => 'nullable|integer',
+//         'fertilizer_registration' => 'nullable|string|max:255',
+//         'physical_form' => 'nullable|string|max:50',
+//         'trade_name' => 'nullable|string|max:255',
+//         'application_rate' => 'nullable|string|max:255',
+//         'n' => 'nullable|numeric',
+//         'p2' => 'nullable|numeric',
+//         'k2' => 'nullable|numeric',
+//         'zn' => 'nullable|numeric',
+//         'ca' => 'nullable|numeric',
+//         'mg' => 'nullable|numeric',
+//         's' => 'nullable|numeric',
+//         'b' => 'nullable|numeric',
+//         'mo' => 'nullable|numeric',
+//     ]);
+
+//     if ($validator->fails()) {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Validation Error.',
+//             'errors' => $validator->errors()
+//         ], 422);
+//     }
+
+//     // 🔹 Common data array
+//     $data = [
+//         'title' => $request->title ?? '',
+//         'form_type' => $request->form_type ?? 'mineral_fertilizer',
+//         'product_id' => $request->product_id,
+//         'fertilizer_type' => $request->fertilizer_type,
+//         'fertilizer_registration' => $request->fertilizer_registration ?? '',
+//         'physical_form' => $request->physical_form ?? '',
+//         'trade_name' => $request->trade_name ?? '',
+//         'application_rate' => $request->application_rate ?? '',
+//         'n' => $request->n ?? 0,
+//         'p2' => $request->p2 ?? 0,
+//         'k2' => $request->k2 ?? 0,
+//         'zn' => $request->zn ?? 0,
+//         'ca' => $request->ca ?? 0,
+//         'mg' => $request->mg ?? 0,
+//         's' => $request->s ?? 0,
+//         'b' => $request->b ?? 0,
+//         'mo' => $request->mo ?? 0,
+//         'fertilizer_wholesale_price' => $request->fertilizer_wholesale_price,
+//         'fertilizer_semiwholesale_price' => $request->fertilizer_semiwholesale_price,
+//         'fertilizer_retail_price' => $request->fertilizer_retail_price,
+//         'supplier_id' => $request->supplier_id ?? null,
+//         'agent_id' => $request->agent_id ?? 1, // default 1
+//         'status_id' => $request->status_id ?? 1, // default 1
+//         'created_by' => $request->created_by ?? Auth::id() ?? 1,
+//         'language_id' => $request->language_id ?? null,
+//     ];
+
+//     try {
+//         if ($id) {
+//             // 🔹 Update existing
+//             $fertilizer = MineralFertilizer::find($id);
+//             if (!$fertilizer) {
+//                 return response()->json([
+//                     'status' => false,
+//                     'message' => 'Mineral Fertilizer record not found for update.'
+//                 ], 404);
+//             }
+//             $fertilizer->update($data);
+//             $message = 'Mineral Fertilizer updated successfully';
+//         } else {
+//             // 🔹 Create new
+//             $fertilizer = MineralFertilizer::create($data);
+//             $message = 'Mineral Fertilizer created successfully';
+
+//             // Save in AllProduct table
+//             AllProduct::create([
+//                 'form_type' => 'mineral_fertilizer',
+//                 'product_id' => $request->product_id,
+//                 'related_id' => $fertilizer->id,
+//             ]);
+//         }
+
+//         // -----------------------------
+//         // Generate QR code
+//         // -----------------------------
+//         include_once(public_path('phpqrcode/qrlib.php'));
+//         $qrFolder = public_path('qrcodes');
+//         if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+//         $qrFileName = 'fertilizer_' . $fertilizer->id . '.png';
+//         $fullPath = $qrFolder . '/' . $qrFileName;
+//         $url = url('/mineral-fertilizer/' . $fertilizer->id);
+//         \QRcode::png($url, $fullPath, 'L', 4, 2);
+
+//         $fertilizer->qr_code_path = 'qrcodes/' . $qrFileName;
+//         $fertilizer->save();
+
+//         return response()->json([
+//             'status' => true,
+//             'message' => $message,
+//             'data' => $fertilizer
+//         ], $id ? 200 : 201);
+
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Failed to save Mineral Fertilizer',
+//             'error' => $e->getMessage()
+//         ], 500);
+//     }
+// }18-1-25
+private function storeMineralFertilizer(Request $request, $id = null)
+{
+    $validator = Validator::make($request->all(), [
+        'product_id' => 'required|integer',
+        'fertilizer_type' => 'required|string|max:255',
+        'fertilizer_wholesale_price' => 'required|numeric',
+        'fertilizer_semiwholesale_price' => 'required|numeric',
+        'fertilizer_retail_price' => 'required|numeric',
+        'title' => 'nullable|string|max:255',
+        'form_type' => 'nullable|string|max:50',
+        'fertilizer_registration' => 'nullable|string|max:255',
+        'physical_form' => 'nullable|string|max:50',
+        'trade_name' => 'nullable|string|max:255',
+        'application_rate' => 'nullable|string|max:255',
+        'n' => 'nullable|numeric',
+        'p2' => 'nullable|numeric',
+        'k2' => 'nullable|numeric',
+        'zn' => 'nullable|numeric',
+        'ca' => 'nullable|numeric',
+        'mg' => 'nullable|numeric',
+        's' => 'nullable|numeric',
+        'b' => 'nullable|numeric',
+        'mo' => 'nullable|numeric',
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Validation Error.',
+            'errors' => $validator->errors()
+        ], 422);
+    }
+
+    $data = [
+        'title' => $request->title ?? '',
+        'form_type' => $request->form_type ?? 'mineral_fertilizer',
+        'product_id' => $request->product_id,
+        'fertilizer_type' => $request->fertilizer_type,
+        'fertilizer_registration' => $request->fertilizer_registration ?? '',
+        'physical_form' => $request->physical_form ?? '',
+        'trade_name' => $request->trade_name ?? '',
+        'application_rate' => $request->application_rate ?? '',
+        'n' => $request->n ?? 0,
+        'p2' => $request->p2 ?? 0,
+        'k2' => $request->k2 ?? 0,
+        'zn' => $request->zn ?? 0,
+        'ca' => $request->ca ?? 0,
+        'mg' => $request->mg ?? 0,
+        's' => $request->s ?? 0,
+        'b' => $request->b ?? 0,
+        'mo' => $request->mo ?? 0,
+        'fertilizer_wholesale_price' => $request->fertilizer_wholesale_price,
+        'fertilizer_semiwholesale_price' => $request->fertilizer_semiwholesale_price,
+        'fertilizer_retail_price' => $request->fertilizer_retail_price,
+        'supplier_id' => $request->supplier_id ?? null,
+        'agent_id' => 1,
+        // 'status_id' => 1,
+        'created_by' => Auth::id() ?? 1,
+        'language_id' => $request->language_id ?? 1,
+    ];
+     if ($request->filled('supplier_id')) {
+    // Supplier आया → Status 1
+    $validated['status_id'] = 1;
+} elseif ($request->filled('agent_id') && !$request->filled('supplier_id')) {
+    // Sirf Agent आया → Status 4
+    $validated['status_id'] = 4;
+} else {
+    $validated['status_id'] = 1; // Default
+}
+
+
+    try {
+        if ($id) {
+            $fertilizer = MineralFertilizer::find($id);
+            if (!$fertilizer) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Mineral Fertilizer record not found for update.'
+                ], 404);
+            }
+
+            // 🔹 Store old prices in price_histories before update
+            \DB::table('price_histories')->insert([
+                'product_id' => $fertilizer->product_id,
+                'supplier_id' => $fertilizer->supplier_id,
+                'wholesalePrice' => $fertilizer->fertilizer_wholesale_price,
+                'semiwholesalePrice' => $fertilizer->fertilizer_semiwholesale_price,
+                'retailPrice' => $fertilizer->fertilizer_retail_price,
+                'updated_by' => $data['created_by'],
+                'add_product_id' => $fertilizer->id,
+                'changed_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $fertilizer->update($data);
+            $message = 'Mineral Fertilizer updated successfully';
+
+        } else {
+            // CREATE CASE
+            $fertilizer = MineralFertilizer::create($data);
+              Notification::create([
+                'title'   => 'New Mineral Fertilizer Added',
+                'message' => "Mineral Fertilizer {$request->trade_name} has been added.",
+                'is_read' => 0,
+            ]);
+
+
+            // 🔹 Store initial prices in price_histories
+            \DB::table('price_histories')->insert([
+                'product_id' => $fertilizer->product_id,
+                'supplier_id' => $fertilizer->supplier_id,
+                'wholesalePrice' => $fertilizer->fertilizer_wholesale_price,
+                'semiwholesalePrice' => $fertilizer->fertilizer_semiwholesale_price,
+                'retailPrice' => $fertilizer->fertilizer_retail_price,
+                'updated_by' => $data['created_by'],
+                'add_product_id' => $fertilizer->id,
+                'changed_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $message = 'Mineral Fertilizer created successfully';
+        }
+
+        // QR CODE
+        include_once(public_path('phpqrcode/qrlib.php'));
+        $qrFolder = public_path('qrcodes');
+        if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+        $qrFileName = 'fertilizer_' . $fertilizer->id . '.png';
+        \QRcode::png(url('/mineral-fertilizer/' . $fertilizer->id), $qrFolder . '/' . $qrFileName, 'L', 4, 2);
+
+        $fertilizer->qr_code_path = 'qrcodes/' . $qrFileName;
+        $fertilizer->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => $message,
+            'data' => $fertilizer
+        ], $id ? 200 : 201);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to save Mineral Fertilizer',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+// private function storeMineralFertilizer(Request $request, $id = null)
+// {
+//     $validator = Validator::make($request->all(), [
+//         'product_id' => 'required|integer',
+//         'fertilizer_type' => 'required|string|max:255',
+//         'fertilizer_wholesale_price' => 'required|numeric',
+//         'fertilizer_semiwholesale_price' => 'required|numeric',
+//         'fertilizer_retail_price' => 'required|numeric',
+//         'title' => 'nullable|string|max:255',
+//         'form_type' => 'nullable|string|max:50',
+//         'fertilizer_registration' => 'nullable|string|max:255',
+//         'physical_form' => 'nullable|string|max:50',
+//         'trade_name' => 'nullable|string|max:255',
+//         'application_rate' => 'nullable|string|max:255',
+//         'n' => 'nullable|numeric',
+//         'p2' => 'nullable|numeric',
+//         'k2' => 'nullable|numeric',
+//         'zn' => 'nullable|numeric',
+//         'ca' => 'nullable|numeric',
+//         'mg' => 'nullable|numeric',
+//         's' => 'nullable|numeric',
+//         'b' => 'nullable|numeric',
+//         'mo' => 'nullable|numeric',
+//     ]);
+
+//     if ($validator->fails()) {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Validation Error.',
+//             'errors' => $validator->errors()
+//         ], 422);
+//     }
+
+//     $data = [
+//         'title' => $request->title ?? '',
+//         'form_type' => $request->form_type ?? 'mineral_fertilizer',
+//         'product_id' => $request->product_id,
+//         'fertilizer_type' => $request->fertilizer_type,
+//         'fertilizer_registration' => $request->fertilizer_registration ?? '',
+//         'physical_form' => $request->physical_form ?? '',
+//         'trade_name' => $request->trade_name ?? '',
+//         'application_rate' => $request->application_rate ?? '',
+//         'n' => $request->n ?? 0,
+//         'p2' => $request->p2 ?? 0,
+//         'k2' => $request->k2 ?? 0,
+//         'zn' => $request->zn ?? 0,
+//         'ca' => $request->ca ?? 0,
+//         'mg' => $request->mg ?? 0,
+//         's' => $request->s ?? 0,
+//         'b' => $request->b ?? 0,
+//         'mo' => $request->mo ?? 0,
+//         'fertilizer_wholesale_price' => $request->fertilizer_wholesale_price,
+//         'fertilizer_semiwholesale_price' => $request->fertilizer_semiwholesale_price,
+//         'fertilizer_retail_price' => $request->fertilizer_retail_price,
+//         'supplier_id' => $request->supplier_id ?? null,
+//         'agent_id' => 1,
+//         'status_id' => 1,
+//         'created_by' => Auth::id() ?? 1,
+//         'language_id' => $request->language_id ?? 1,
+//     ];
+
+//     try {
+//         if ($id) {
+//             $fertilizer = MineralFertilizer::find($id);
+//             if (!$fertilizer) {
+//                 return response()->json([
+//                     'status' => false,
+//                     'message' => 'Mineral Fertilizer record not found for update.'
+//                 ], 404);
+//             }
+
+//             // 🔹 Store old prices in price_histories before update
+//             \DB::table('price_histories')->insert([
+//                 'product_id' => $fertilizer->product_id,
+//                 'supplier_id' => $fertilizer->supplier_id,
+//                 'wholesalePrice' => $fertilizer->fertilizer_wholesale_price,
+//                 'semiwholesalePrice' => $fertilizer->fertilizer_semiwholesale_price,
+//                 'retailPrice' => $fertilizer->fertilizer_retail_price,
+//                 'updated_by' => $data['created_by'],
+//                 'add_product_id' => $fertilizer->id,
+//                 'changed_at' => now(),
+//                 'created_at' => now(),
+//                 'updated_at' => now(),
+//             ]);
+
+//             $fertilizer->update($data);
+//             $message = 'Mineral Fertilizer updated successfully';
+
+//         } else {
+//             // CREATE CASE
+//             $fertilizer = MineralFertilizer::create($data);
+
+//             // 🔹 Store initial prices in price_histories
+//             \DB::table('price_histories')->insert([
+//                 'product_id' => $fertilizer->product_id,
+//                 'supplier_id' => $fertilizer->supplier_id,
+//                 'wholesalePrice' => $fertilizer->fertilizer_wholesale_price,
+//                 'semiwholesalePrice' => $fertilizer->fertilizer_semiwholesale_price,
+//                 'retailPrice' => $fertilizer->fertilizer_retail_price,
+//                 'updated_by' => $data['created_by'],
+//                 'add_product_id' => $fertilizer->id,
+//                 'changed_at' => now(),
+//                 'created_at' => now(),
+//                 'updated_at' => now(),
+//             ]);
+
+//             $message = 'Mineral Fertilizer created successfully';
+//         }
+
+//         // QR CODE
+//         include_once(public_path('phpqrcode/qrlib.php'));
+//         $qrFolder = public_path('qrcodes');
+//         if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+//         $qrFileName = 'fertilizer_' . $fertilizer->id . '.png';
+//         \QRcode::png(url('/mineral-fertilizer/' . $fertilizer->id), $qrFolder . '/' . $qrFileName, 'L', 4, 2);
+
+//         $fertilizer->qr_code_path = 'qrcodes/' . $qrFileName;
+//         $fertilizer->save();
+
+//         return response()->json([
+//             'status' => true,
+//             'message' => $message,
+//             'data' => $fertilizer
+//         ], $id ? 200 : 201);
+
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Failed to save Mineral Fertilizer',
+//             'error' => $e->getMessage()
+//         ], 500);
+//     }
+// }
+
+
+private function storeOrganicAmendment(Request $request)
+{
+    $validated = $request->validate([
+        'id' => 'nullable|integer',
+        'product_id' => 'nullable|integer',
+        'organic_type' => 'required|string|max:255',
+        'physical_form' => 'required|string|max:255',
+        'trade_name' => 'required|string|max:255',
+        'country_origin' => 'required|string|max:255',
+        'bio_label' => 'required|string|max:255',
+        'n' => 'nullable|numeric',
+        'p2' => 'nullable|numeric',
+        'k2' => 'nullable|numeric',
+        'cao' => 'nullable|numeric',
+        'mgo' => 'nullable|numeric',
+        'cn_ratio' => 'nullable|string|max:255',
+        'raw_material' => 'nullable|array',
+        'raw_material_other' => 'nullable|string|max:255',
+        'arsenic_content' => 'nullable|string|max:50',
+        'wholesale_price' => 'required|numeric',
+        'semiwholesale_price' => 'required|numeric',
+        'retail_price' => 'required|numeric',
+        'supplier_id' => 'nullable|integer',
+        'agent_id' => 'nullable|integer',
+        'status_id' => 'nullable|integer',
+        'created_by' => 'nullable|integer',
+        'language_id' => 'nullable|integer'
+    ]);
+
+    // ---------- DEFAULT VALUES ----------
+    $validated['language_id'] = $request->input('language_id', 1);
+    $validated['form_type'] = 'organic_amendment';
+    $validated['created_by'] = $request->input('created_by', Auth::id() ?? 1);
+    $validated['raw_material'] = json_encode($validated['raw_material'] ?? []);
+    $validated['product_id'] = $request->input('product_id');
+    // $validated['status_id'] = $request->input('status_id', 1);
+    $validated['agent_id'] = $request->input('agent_id', 1);
+     if ($request->filled('supplier_id')) {
+    // Supplier आया → Status 1
+    $validated['status_id'] = 1;
+} elseif ($request->filled('agent_id') && !$request->filled('supplier_id')) {
+    // Sirf Agent आया → Status 4
+    $validated['status_id'] = 4;
+} else {
+    $validated['status_id'] = 1; // Default
+}
+
+
+    if (!empty($validated['id'])) {
+
+        // UPDATE
+        $organic = OrganicAmendment::find($validated['id']);
+        if (!$organic) {
+            return response()->json(['error' => 'Organic amendment not found.'], 404);
+        }
+
+        // 🔹 Store old prices in price_histories before update
+        \DB::table('price_histories')->insert([
+            'product_id' => $organic->product_id,
+            'supplier_id' => $organic->supplier_id,
+            'wholesalePrice' => $organic->wholesale_price,
+            'semiwholesalePrice' => $organic->semiwholesale_price,
+            'retailPrice' => $organic->retail_price,
+            'updated_by' => $validated['created_by'],
+            'add_product_id' => $organic->id,
+            'changed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $organic->update($validated);
+        $message = 'Organic Amendment updated successfully';
+
+        // Update AllProduct
+        
+
+    } else {
+
+        // CREATE
+        $organic = OrganicAmendment::create($validated);
+           Notification::create([
+            'title'   => 'New Organic Amendment Added',
+            'message' => "Organic Amendment {$organic->trade_name} has been added.",
+            'is_read' => 0,
+        ]);
+        $message = 'Organic Amendment created successfully';
+
+        // 🔹 Insert initial prices in price_histories
+        \DB::table('price_histories')->insert([
+            'product_id' => $organic->product_id,
+            'supplier_id' => $organic->supplier_id,
+            'wholesalePrice' => $organic->wholesale_price,
+            'semiwholesalePrice' => $organic->semiwholesale_price,
+            'retailPrice' => $organic->retail_price,
+            'updated_by' => $validated['created_by'],
+            'add_product_id' => $organic->id,
+            'changed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Optionally insert in AllProduct table
+        // AllProduct::create([...]);
+    }
+
+    // ---------- QR CODE GENERATION ----------
+    include_once(public_path('phpqrcode/qrlib.php'));
+    $qrFolder = public_path('qrcodes');
+    if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+    $qrFileName = 'organic_' . $organic->id . '.png';
+    $fullPath = $qrFolder . '/' . $qrFileName;
+    $url = url('/organic-amendment/' . $organic->id);
+
+    \QRcode::png($url, $fullPath, 'L', 4, 2);
+
+    $organic->qr_code_path = 'qrcodes/' . $qrFileName;
+    $organic->save();
+
+    return response()->json([
+        'status' => true,
+        'message' => $message,
+        'data' => $organic
+    ], !empty($validated['id']) ? 200 : 201);
+}
+
+// private function storeOrganicAmendment(Request $request)
+// {
+//     $validated = $request->validate([
+//         'id' => 'nullable|integer',
+//         'product_id' => 'nullable|integer',
+//         'organic_type' => 'required|string|max:255',
+//         'physical_form' => 'required|string|max:255',
+//         'trade_name' => 'required|string|max:255',
+//         'country_origin' => 'required|string|max:255',
+//         'bio_label' => 'required|string|max:255',
+//         'n' => 'nullable|numeric',
+//         'p2' => 'nullable|numeric',
+//         'k2' => 'nullable|numeric',
+//         'cao' => 'nullable|numeric',
+//         'mgo' => 'nullable|numeric',
+//         'cn_ratio' => 'nullable|string|max:255',
+//         'raw_material' => 'nullable|array',
+//         'raw_material_other' => 'nullable|string|max:255',
+//         'arsenic_content' => 'nullable|string|max:50',
+//         'wholesale_price' => 'required|numeric',
+//         'semiwholesale_price' => 'required|numeric',
+//         'retail_price' => 'required|numeric',
+//         'supplier_id' => 'nullable|integer',
+//         'agent_id' => 'nullable|integer',
+//         'status_id' => 'nullable|integer',
+//         'created_by' => 'nullable|integer',
+//         'language_id' => 'nullable|integer'
+//     ]);
+
+//     // ---------- DEFAULT VALUES ----------
+//     $validated['language_id'] = $request->input('language_id', 1);
+//     $validated['form_type'] = 'organic_amendment';
+//     $validated['created_by'] = $request->input('created_by', Auth::id() ?? 1);
+//     $validated['raw_material'] = json_encode($validated['raw_material'] ?? []);
+//     $validated['product_id'] = $request->input('product_id');
+//     $validated['status_id'] = $request->input('status_id', 1);
+//     $validated['agent_id'] = $request->input('agent_id', 1);
+
+//     if (!empty($validated['id'])) {
+
+//         // UPDATE
+//         $organic = OrganicAmendment::find($validated['id']);
+//         if (!$organic) {
+//             return response()->json(['error' => 'Organic amendment not found.'], 404);
+//         }
+
+//         // 🔹 Store old prices in price_histories before update
+//         \DB::table('price_histories')->insert([
+//             'product_id' => $organic->product_id,
+//             'supplier_id' => $organic->supplier_id,
+//             'wholesalePrice' => $organic->wholesale_price,
+//             'semiwholesalePrice' => $organic->semiwholesale_price,
+//             'retailPrice' => $organic->retail_price,
+//             'updated_by' => $validated['created_by'],
+//             'add_product_id' => $organic->id,
+//             'changed_at' => now(),
+//             'created_at' => now(),
+//             'updated_at' => now(),
+//         ]);
+
+//         $organic->update($validated);
+//         $message = 'Organic Amendment updated successfully';
+
+//         // Update AllProduct
+        
+
+//     } else {
+
+//         // CREATE
+//         $organic = OrganicAmendment::create($validated);
+//         $message = 'Organic Amendment created successfully';
+
+//         // 🔹 Insert initial prices in price_histories
+//         \DB::table('price_histories')->insert([
+//             'product_id' => $organic->product_id,
+//             'supplier_id' => $organic->supplier_id,
+//             'wholesalePrice' => $organic->wholesale_price,
+//             'semiwholesalePrice' => $organic->semiwholesale_price,
+//             'retailPrice' => $organic->retail_price,
+//             'updated_by' => $validated['created_by'],
+//             'add_product_id' => $organic->id,
+//             'changed_at' => now(),
+//             'created_at' => now(),
+//             'updated_at' => now(),
+//         ]);
+
+//         // Optionally insert in AllProduct table
+//         // AllProduct::create([...]);
+//     }
+
+//     // ---------- QR CODE GENERATION ----------
+//     include_once(public_path('phpqrcode/qrlib.php'));
+//     $qrFolder = public_path('qrcodes');
+//     if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+//     $qrFileName = 'organic_' . $organic->id . '.png';
+//     $fullPath = $qrFolder . '/' . $qrFileName;
+//     $url = url('/organic-amendment/' . $organic->id);
+
+//     \QRcode::png($url, $fullPath, 'L', 4, 2);
+
+//     $organic->qr_code_path = 'qrcodes/' . $qrFileName;
+//     $organic->save();
+
+//     return response()->json([
+//         'status' => true,
+//         'message' => $message,
+//         'data' => $organic
+//     ], !empty($validated['id']) ? 200 : 201);
+// }
+
+
+
+
+private function storeSyntheticPesticide(Request $request)
+{
+    $validated = $request->validate([
+        'id' => 'nullable|integer',
+        'trade_name' => 'required|string|max:255',
+        'active_ingredient' => 'nullable|string|max:255',
+        'other_active_ingredient' => 'nullable|string|max:255',
+        'formulation' => 'nullable|string|max:255',
+        'registration_number' => 'required|string|max:255',
+        'function' => 'nullable|string|max:255',
+        'other_function' => 'nullable|string|max:255',
+        'toxicological_class_number' => 'nullable|string|max:255',
+        'approval_number' => 'required|string|max:255',
+        'wholesale_price' => 'nullable|numeric',
+        'semiwholesale_price' => 'nullable|numeric',
+        'retail_price' => 'nullable|numeric',
+        'product_id' => 'nullable|integer',
+        'supplier_id' => 'nullable|integer',
+        'agent_id' => 'nullable|integer',
+        'status_id' => 'nullable|integer',
+        'language_id' => 'nullable|integer',
+        'created_by' => 'nullable|integer',
+    ]);
+
+    // ---------- DEFAULT VALUES ----------
+    $validated['language_id'] = $validated['language_id'] ?? 1;
+    $validated['form_type'] = 'synthetic_pesticide';
+    $validated['created_by'] = $validated['created_by'] ?? (Auth::id() ?? 1);
+    $validated['product_id'] = $validated['product_id'] ?? null;
+    // $validated['status_id'] = 1; // always default 1
+    $validated['agent_id'] = $validated['agent_id'] ?? 1;
+
+
+     if ($request->filled('supplier_id')) {
+    // Supplier आया → Status 1
+    $validated['status_id'] = 1;
+} elseif ($request->filled('agent_id') && !$request->filled('supplier_id')) {
+    // Sirf Agent आया → Status 4
+    $validated['status_id'] = 4;
+} else {
+    $validated['status_id'] = 1; // Default
+}
+
+    // ---------- CREATE OR UPDATE ----------
+    if (!empty($validated['id'])) {
+
+        // UPDATE
+        $pesticide = SyntheticPesticide::find($validated['id']);
+        if (!$pesticide) {
+            return response()->json(['error' => 'Synthetic pesticide not found.'], 404);
+        }
+
+        // 🔹 Store old prices in price_histories before update
+        \DB::table('price_histories')->insert([
+            'product_id' => $pesticide->product_id,
+            'supplier_id' => $pesticide->supplier_id,
+            'wholesalePrice' => $pesticide->wholesale_price,
+            'semiwholesalePrice' => $pesticide->semiwholesale_price,
+            'retailPrice' => $pesticide->retail_price,
+            'updated_by' => $validated['created_by'],
+            'add_product_id' => $pesticide->id,
+            'changed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $pesticide->update($validated);
+        $message = 'Synthetic Pesticide updated successfully';
+
+    } else {
+
+        // CREATE
+        $pesticide = SyntheticPesticide::create($validated);
+        $message = 'Synthetic Pesticide created successfully';
+
+        // 🔹 Save initial prices in price_histories
+        \DB::table('price_histories')->insert([
+            'product_id' => $pesticide->product_id,
+            'supplier_id' => $pesticide->supplier_id,
+            'wholesalePrice' => $pesticide->wholesale_price,
+            'semiwholesalePrice' => $pesticide->semiwholesale_price,
+            'retailPrice' => $pesticide->retail_price,
+            'updated_by' => $validated['created_by'],
+            'add_product_id' => $pesticide->id,
+            'changed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        Notification::create([
+            'title'   => 'New Synthetic Pesticide Added',
+            'message' => "Pesticide {$validated['trade_name']} has been added.",
+            'is_read' => 0,
+        ]);
+    }
+
+    // ---------- QR CODE GENERATION ----------
+    include_once(public_path('phpqrcode/qrlib.php'));
+    $qrFolder = public_path('qrcodes');
+    if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+    $qrFileName = 'pesticide_' . $pesticide->id . '.png';
+    $fullPath = $qrFolder . '/' . $qrFileName;
+    $url = url('/synthetic-pesticide/' . $pesticide->id);
+
+    \QRcode::png($url, $fullPath, 'L', 4, 2);
+
+    $pesticide->qr_code_path = 'qrcodes/' . $qrFileName;
+    $pesticide->save();
+
+    return response()->json([
+        'status' => true,
+        'message' => $message,
+        'data' => $pesticide
+    ], !empty($validated['id']) ? 200 : 201);
+}
+// private function storeSyntheticPesticide(Request $request)
+// {
+//     $validated = $request->validate([
+//         'id' => 'nullable|integer',
+//         'trade_name' => 'required|string|max:255',
+//         'active_ingredient' => 'nullable|string|max:255',
+//         'other_active_ingredient' => 'nullable|string|max:255',
+//         'formulation' => 'nullable|string|max:255',
+//         'registration_number' => 'required|string|max:255',
+//         'function' => 'nullable|string|max:255',
+//         'other_function' => 'nullable|string|max:255',
+//         'toxicological_class_number' => 'nullable|string|max:255',
+//         'approval_number' => 'required|string|max:255',
+//         'wholesale_price' => 'nullable|numeric',
+//         'semiwholesale_price' => 'nullable|numeric',
+//         'retail_price' => 'nullable|numeric',
+//         'product_id' => 'nullable|integer',
+//         'supplier_id' => 'nullable|integer',
+//         'agent_id' => 'nullable|integer',
+//         'status_id' => 'nullable|integer',
+//         'language_id' => 'nullable|integer',
+//         'created_by' => 'nullable|integer',
+//     ]);
+
+//     // ---------- DEFAULT VALUES ----------
+//     $validated['language_id'] = $validated['language_id'] ?? 1;
+//     $validated['form_type'] = 'synthetic_pesticide';
+//     $validated['created_by'] = $validated['created_by'] ?? (Auth::id() ?? 1);
+//     $validated['product_id'] = $validated['product_id'] ?? null;
+//     $validated['status_id'] = 1; // always default 1
+//     $validated['agent_id'] = $validated['agent_id'] ?? 1;
+
+//     // ---------- CREATE OR UPDATE ----------
+//     if (!empty($validated['id'])) {
+
+//         // UPDATE
+//         $pesticide = SyntheticPesticide::find($validated['id']);
+//         if (!$pesticide) {
+//             return response()->json(['error' => 'Synthetic pesticide not found.'], 404);
+//         }
+
+//         // 🔹 Store old prices in price_histories before update
+//         \DB::table('price_histories')->insert([
+//             'product_id' => $pesticide->product_id,
+//             'supplier_id' => $pesticide->supplier_id,
+//             'wholesalePrice' => $pesticide->wholesale_price,
+//             'semiwholesalePrice' => $pesticide->semiwholesale_price,
+//             'retailPrice' => $pesticide->retail_price,
+//             'updated_by' => $validated['created_by'],
+//             'add_product_id' => $pesticide->id,
+//             'changed_at' => now(),
+//             'created_at' => now(),
+//             'updated_at' => now(),
+//         ]);
+
+//         $pesticide->update($validated);
+//         $message = 'Synthetic Pesticide updated successfully';
+
+//     } else {
+
+//         // CREATE
+//         $pesticide = SyntheticPesticide::create($validated);
+//         $message = 'Synthetic Pesticide created successfully';
+
+//         // 🔹 Save initial prices in price_histories
+//         \DB::table('price_histories')->insert([
+//             'product_id' => $pesticide->product_id,
+//             'supplier_id' => $pesticide->supplier_id,
+//             'wholesalePrice' => $pesticide->wholesale_price,
+//             'semiwholesalePrice' => $pesticide->semiwholesale_price,
+//             'retailPrice' => $pesticide->retail_price,
+//             'updated_by' => $validated['created_by'],
+//             'add_product_id' => $pesticide->id,
+//             'changed_at' => now(),
+//             'created_at' => now(),
+//             'updated_at' => now(),
+//         ]);
+//     }
+
+//     // ---------- QR CODE GENERATION ----------
+//     include_once(public_path('phpqrcode/qrlib.php'));
+//     $qrFolder = public_path('qrcodes');
+//     if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+//     $qrFileName = 'pesticide_' . $pesticide->id . '.png';
+//     $fullPath = $qrFolder . '/' . $qrFileName;
+//     $url = url('/synthetic-pesticide/' . $pesticide->id);
+
+//     \QRcode::png($url, $fullPath, 'L', 4, 2);
+
+//     $pesticide->qr_code_path = 'qrcodes/' . $qrFileName;
+//     $pesticide->save();
+
+//     return response()->json([
+//         'status' => true,
+//         'message' => $message,
+//         'data' => $pesticide
+//     ], !empty($validated['id']) ? 200 : 201);
+// }
+
+
+
+private function storeVeterinaryProduct(Request $request)
+{
+    $validated = $request->validate([
+        'id' => 'nullable|integer', 
+        'title' => 'nullable|string|max:255',
+        'product_name' => 'required|string|max:255',
+        'manufacturing_lab' => 'nullable|string|max:255',
+        'active_substance' => 'nullable|string|max:255',
+        'registration_number' => 'required|string|max:255',
+        'therapeutic_class' => 'nullable|string|max:255',
+        'other_therapeutic_class' => 'nullable|string|max:255',
+        'dosage' => 'nullable|string|max:255',
+        'pharmaceutical_form' => 'nullable|string|max:255',
+        'route_of_administration' => 'nullable|string|max:255',
+        'targeted_animals' => 'nullable|string|max:255',
+        'waiting_period' => 'nullable|string|max:255',
+        'expiry_date' => 'nullable|date',
+        'transport_storage_requirements' => 'nullable|string|max:255',
+        'wholesale_price' => 'required|numeric',
+        'semiwholesale_price' => 'required|numeric',
+        'retail_price' => 'required|numeric',
+        'product_id' => 'required|integer',
+        'supplier_id' => 'nullable|integer',
+        'agent_id' => 'nullable|integer',
+        'status_id' => 'nullable|integer',
+        'language_id' => 'nullable|integer',
+        'created_by' => 'nullable|integer',
+    ]);
+
+    // Default values
+    $validated['language_id'] = $validated['language_id'] ?? 1;
+    $validated['created_by'] = $validated['created_by'] ?? (Auth::id() ?? 1);
+    $validated['agent_id'] = $validated['agent_id'] ?? 1;
+    // $validated['status_id'] = $validated['status_id'] ?? 1;
+    $validated['form_type'] = 'veterinary_product';
+
+     if ($request->filled('supplier_id')) {
+    // Supplier आया → Status 1
+    $validated['status_id'] = 1;
+} elseif ($request->filled('agent_id') && !$request->filled('supplier_id')) {
+    // Sirf Agent आया → Status 4
+    $validated['status_id'] = 4;
+} else {
+    $validated['status_id'] = 1; // Default
+}
+
+
+    // CREATE OR UPDATE
+    if (!empty($validated['id'])) {
+        $veterinary = VeterinaryProduct::find($validated['id']);
+        if ($veterinary) {
+            // 🔹 Store old prices in price_histories before updating
+            \DB::table('price_histories')->insert([
+                'product_id' => $veterinary->product_id,
+                'supplier_id' => $veterinary->supplier_id,
+                'wholesalePrice' => $veterinary->wholesale_price,
+                'semiwholesalePrice' => $veterinary->semiwholesale_price,
+                'retailPrice' => $veterinary->retail_price,
+                'updated_by' => $validated['created_by'],
+                'add_product_id' => $veterinary->id,
+                'changed_at' => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $veterinary->update($validated);
+            $message = 'Veterinary product updated successfully';
+        } else {
+            return response()->json(['error' => 'Veterinary product not found.'], 404);
+        }
+    } else {
+        $veterinary = VeterinaryProduct::create($validated);
+        $message = 'Veterinary product created successfully';
+
+        // 🔹 Save initial prices in price_histories
+        \DB::table('price_histories')->insert([
+            'product_id' => $veterinary->product_id,
+            'supplier_id' => $veterinary->supplier_id,
+            'wholesalePrice' => $veterinary->wholesale_price,
+            'semiwholesalePrice' => $veterinary->semiwholesale_price,
+            'retailPrice' => $veterinary->retail_price,
+            'updated_by' => $validated['created_by'],
+            'add_product_id' => $veterinary->id,
+            'changed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+          Notification::create([
+            'title'   => 'New Veterinary Product Added',
+            'message' => "Product {$validated['product_name']} has been added.",
+            'is_read' => 0,
+        ]);
+    }
+
+    // QR CODE
+    include_once(public_path('phpqrcode/qrlib.php'));
+    $qrFolder = public_path('qrcodes');
+    if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+    $qrFileName = 'veterinary_' . $veterinary->id . '.png';
+    $fullPath = $qrFolder . '/' . $qrFileName;
+    $url = url('/veterinary-product/' . $veterinary->id);
+    \QRcode::png($url, $fullPath, 'L', 4, 2);
+
+    $veterinary->qr_code_path = 'qrcodes/' . $qrFileName;
+    $veterinary->save();
+
+    return response()->json([
+        'status' => true,
+        'message' => $message,
+        'data' => $veterinary
+    ], !empty($validated['id']) ? 200 : 201);
+}
+// private function storeVeterinaryProduct(Request $request)
+// {
+//     $validated = $request->validate([
+//         'id' => 'nullable|integer', 
+//         'title' => 'nullable|string|max:255',
+//         'product_name' => 'required|string|max:255',
+//         'manufacturing_lab' => 'nullable|string|max:255',
+//         'active_substance' => 'nullable|string|max:255',
+//         'registration_number' => 'required|string|max:255',
+//         'therapeutic_class' => 'nullable|string|max:255',
+//         'other_therapeutic_class' => 'nullable|string|max:255',
+//         'dosage' => 'nullable|string|max:255',
+//         'pharmaceutical_form' => 'nullable|string|max:255',
+//         'route_of_administration' => 'nullable|string|max:255',
+//         'targeted_animals' => 'nullable|string|max:255',
+//         'waiting_period' => 'nullable|string|max:255',
+//         'expiry_date' => 'nullable|date',
+//         'transport_storage_requirements' => 'nullable|string|max:255',
+//         'wholesale_price' => 'required|numeric',
+//         'semiwholesale_price' => 'required|numeric',
+//         'retail_price' => 'required|numeric',
+//         'product_id' => 'required|integer',
+//         'supplier_id' => 'nullable|integer',
+//         'agent_id' => 'nullable|integer',
+//         'status_id' => 'nullable|integer',
+//         'language_id' => 'nullable|integer',
+//         'created_by' => 'nullable|integer',
+//     ]);
+
+//     // Default values
+//     $validated['language_id'] = $validated['language_id'] ?? 1;
+//     $validated['created_by'] = $validated['created_by'] ?? (Auth::id() ?? 1);
+//     $validated['agent_id'] = $validated['agent_id'] ?? 1;
+//     $validated['status_id'] = $validated['status_id'] ?? 1;
+//     $validated['form_type'] = 'veterinary_product';
+
+//     // CREATE OR UPDATE
+//     if (!empty($validated['id'])) {
+//         $veterinary = VeterinaryProduct::find($validated['id']);
+//         if ($veterinary) {
+//             // 🔹 Store old prices in price_histories before updating
+//             \DB::table('price_histories')->insert([
+//                 'product_id' => $veterinary->product_id,
+//                 'supplier_id' => $veterinary->supplier_id,
+//                 'wholesalePrice' => $veterinary->wholesale_price,
+//                 'semiwholesalePrice' => $veterinary->semiwholesale_price,
+//                 'retailPrice' => $veterinary->retail_price,
+//                 'updated_by' => $validated['created_by'],
+//                 'add_product_id' => $veterinary->id,
+//                 'changed_at' => now(),
+//                 'created_at' => now(),
+//                 'updated_at' => now(),
+//             ]);
+
+//             $veterinary->update($validated);
+//             $message = 'Veterinary product updated successfully';
+//         } else {
+//             return response()->json(['error' => 'Veterinary product not found.'], 404);
+//         }
+//     } else {
+//         $veterinary = VeterinaryProduct::create($validated);
+//         $message = 'Veterinary product created successfully';
+
+//         // 🔹 Save initial prices in price_histories
+//         \DB::table('price_histories')->insert([
+//             'product_id' => $veterinary->product_id,
+//             'supplier_id' => $veterinary->supplier_id,
+//             'wholesalePrice' => $veterinary->wholesale_price,
+//             'semiwholesalePrice' => $veterinary->semiwholesale_price,
+//             'retailPrice' => $veterinary->retail_price,
+//             'updated_by' => $validated['created_by'],
+//             'add_product_id' => $veterinary->id,
+//             'changed_at' => now(),
+//             'created_at' => now(),
+//             'updated_at' => now(),
+//         ]);
+//     }
+
+//     // QR CODE
+//     include_once(public_path('phpqrcode/qrlib.php'));
+//     $qrFolder = public_path('qrcodes');
+//     if (!file_exists($qrFolder)) mkdir($qrFolder, 0755, true);
+
+//     $qrFileName = 'veterinary_' . $veterinary->id . '.png';
+//     $fullPath = $qrFolder . '/' . $qrFileName;
+//     $url = url('/veterinary-product/' . $veterinary->id);
+//     \QRcode::png($url, $fullPath, 'L', 4, 2);
+
+//     $veterinary->qr_code_path = 'qrcodes/' . $qrFileName;
+//     $veterinary->save();
+
+//     return response()->json([
+//         'status' => true,
+//         'message' => $message,
+//         'data' => $veterinary
+//     ], !empty($validated['id']) ? 200 : 201);
+// }
+
+
+public function getOrganicAmendments(Request $request)
+{
+    try {
+        $id = $request->input('id');
+        $supplierId = $request->input('supplier_id');
+        $agentId = $request->input('agent_id');
+
+        $query = OrganicAmendment::query();
+
+        if ($id) {
+            $query->where('id', $id);
+        }
+
+        if ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        if ($agentId) {
+            $query->where('agent_id', $agentId);
+        }
+
+        $organics = $query->get();
+
+        if ($organics->isEmpty()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'No organic amendment data found.',
+                'data' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Organic amendment data fetched successfully.',
+            'data' => $organics
+        ], 200);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to fetch organic amendment data.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
+public function getSyntheticPesticides(Request $request)
+{
+    try {
+        $id = $request->input('id');
+        $supplierId = $request->input('supplier_id');
+        $agentId = $request->input('agent_id');
+
+        $query = SyntheticPesticide::query();
+
+        if ($id) {
+            $query->where('id', $id);
+        }
+
+        if ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        if ($agentId) {
+            $query->where('agent_id', $agentId);
+        }
+
+        $pesticides = $query->get();
+
+        if ($pesticides->isEmpty()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'No synthetic pesticide data found.',
+                'data' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Synthetic pesticide data fetched successfully.',
+            'data' => $pesticides
+        ], 200);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to fetch synthetic pesticide data.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
+public function getVeterinaryProducts(Request $request)
+{
+    try {
+        $id = $request->input('id');
+        $supplierId = $request->input('supplier_id');
+        $agentId = $request->input('agent_id');
+
+        $query = VeterinaryProduct::query();
+
+        if ($id) {
+            $query->where('id', $id);
+        }
+
+        if ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        if ($agentId) {
+            $query->where('agent_id', $agentId);
+        }
+
+        $products = $query->get();
+
+        if ($products->isEmpty()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'No veterinary product data found.',
+                'data' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Veterinary product data fetched successfully.',
+            'data' => $products
+        ], 200);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to fetch veterinary product data.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+public function getInorganicSoilConditioners(Request $request)
+{
+    try {
+        $id = $request->input('id');
+        $supplierId = $request->input('supplier_id');
+        $agentId = $request->input('agent_id');
+
+        $query = \DB::table('inorganic_soil_conditioners');
+
+        if ($id) {
+            $query->where('id', $id);
+        }
+
+        if ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        if ($agentId) {
+            $query->where('agent_id', $agentId);
+        }
+
+        $conditioners = $query->get();
+
+        if ($conditioners->isEmpty()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'No inorganic soil conditioner data found.',
+                'data' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Inorganic soil conditioner data fetched successfully.',
+            'data' => $conditioners
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to fetch inorganic soil conditioner data.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+public function getMineralFertilizers(Request $request)
+{
+    try {
+        $id = $request->input('id');
+        $supplierId = $request->input('supplier_id');
+        $agentId = $request->input('agent_id');
+
+        $query = MineralFertilizer::query();
+
+        if ($id) {
+            $query->where('id', $id);
+        }
+
+        if ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        if ($agentId) {
+            $query->where('agent_id', $agentId);
+        }
+
+        $fertilizers = $query->get();
+
+        if ($fertilizers->isEmpty()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'No mineral fertilizer data found.',
+                'data' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Mineral fertilizer data fetched successfully.',
+            'data' => $fertilizers
+        ], 200);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to fetch mineral fertilizer data.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+public function getBioStimulants(Request $request)
+{
+    try {
+        $id = $request->input('id');
+        $supplierId = $request->input('supplier_id');
+        $agentId = $request->input('agent_id');
+
+        $query = BioStimulant::query();
+
+        if ($id) {
+            $query->where('id', $id);
+        }
+
+        if ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        if ($agentId) {
+            $query->where('agent_id', $agentId);
+        }
+
+        $bioStimulants = $query->get();
+
+        if ($bioStimulants->isEmpty()) {
+            return response()->json([
+                'status' => true,
+                'message' => 'No bio-stimulant data found.',
+                'data' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Bio-stimulant data fetched successfully.',
+            'data' => $bioStimulants
+        ], 200);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to fetch bio-stimulant data.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+public function getAnimalFeeds(Request $request)
+{
+    try {
+        // Optional filters
+        $id = $request->input('id');
+        $supplierId = $request->input('supplier_id');
+        $agentId = $request->input('agent_id');
+
+        $query = AnimalFeed::query();
+
+        if ($id) {
+            $query->where('id', $id);
+        }
+
+        if ($supplierId) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        if ($agentId) {
+            $query->where('agent_id', $agentId);
+        }
+
+        $animalFeeds = $query->get();
+
+        if ($animalFeeds->isEmpty()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'No animal feed data found.',
+                'data' => []
+            ], 200);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Animal feed data fetched successfully.',
+            'data' => $animalFeeds
+        ], 200);
+
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to fetch animal feed data.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
+public function  (Request $request, $id = null)
+{
+    try {
+        if ($id) {
+            // ✅ Get single seed form by ID
+            $seedForm = SeedForm::find($id);
+
+            if (!$seedForm) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Seed form not found.',
+                    'data' => null
+                ], 404);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Seed form fetched successfully.',
+                'data' => $seedForm
+            ], 200);
+        } else {
+            // ✅ Get all seed forms
+            $seedForms = SeedForm::all();
+
+            if ($seedForms->isEmpty()) {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'No seed form data found.',
+                    'data' => []
+                ], 200);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Seed forms fetched successfully.',
+                'data' => $seedForms
+            ], 200);
+        }
+
+    } catch (Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to fetch seed form data.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+// use App\Models\ProductLike;
+
+
+public function getAllFormData(Request $request)
+{
+    try {
+        $qrBaseUrl = 'https://fivoflow.com/wclm/public/qrcodes/';
+
+        // Filters
+        $countryId = $request->query('country_id');
+        $supplierId = $request->query('supplier_id');
+        $lat        = $request->query('lat');
+        $lng        = $request->query('lng');
+        $radius     = $request->query('radius', 10); // default radius 10 km
+
+        // All tables list
+        $tables = [
+            8 => \App\Models\SeedForm::class,
+            1 => \App\Models\VeterinaryProduct::class,
+            3 => \App\Models\SyntheticPesticide::class,
+            7 => \App\Models\MineralFertilizer::class,
+            4 => \App\Models\OrganicAmendment::class,
+            6 => \App\Models\InorganicSoilConditioner::class,
+            2 => \App\Models\AnimalFeed::class,
+            5 => \App\Models\BioStimulant::class,
+        ];
+
+        $data = [];
+
+        foreach ($tables as $key => $model) {
+
+            $query = $model::query()->with('supplier');
+
+            // Filter by supplier
+            if ($supplierId) {
+                $query->where('supplier_id', $supplierId);
+            }
+
+            // Filter by country through supplier
+            if ($countryId) {
+                $query->whereHas('supplier', function ($q) use ($countryId) {
+                    $q->where('country_id', $countryId);
+                });
+            }
+
+            // Geo filter
+            if ($lat && $lng) {
+                $query->whereHas('supplier', function ($q) use ($lat, $lng, $radius) {
+                    $q->whereRaw(
+                        "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) *
+                        cos(radians(longitude) - radians(?))
+                        + sin(radians(?)) * sin(radians(latitude)))) <= ?",
+                        [$lat, $lng, $lat, $radius]
+                    );
+                });
+            }
+
+            // Fetch data
+            $data[$key] = $query->get()->map(function ($item) use ($qrBaseUrl) {
+
+                // ---------------- FAVORITE LOGIC ----------------
+                // Match only product_id + product_row_id
+                $favorite = \App\Models\ProductLike::where('product_id', $item->product_id ?? null)
+                    ->where('product_row_id', $item->id)
+                    ->first();
+
+                // Output must be 1 or 0
+                $item->like_status = $favorite ? 1 : 0;
+                // ------------------------------------------------
+
+                // QR Code URL
+                $item->qr_code_url = !empty($item->qr_code_path)
+                    ? $qrBaseUrl . basename($item->qr_code_path)
+                    : null;
+
+                // Supplier info
+                if ($item->supplier) {
+                    $item->supplier_name = $item->supplier->company_name;
+                    $item->country_id    = $item->supplier->country_id;
+                    $item->latitude      = $item->supplier->latitude ?? null;
+                    $item->longitude     = $item->supplier->longitude ?? null;
+                }
+
+                return $item;
+            });
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'All form data fetched successfully',
+            'data'    => $data
+        ], 200);
+
+    } catch (\Exception $e) {
+
+        return response()->json([
+            'status'  => false,
+            'message' => 'Failed to fetch data',
+            'error'   => $e->getMessage()
+        ], 500);
+    }
+}
+
+
+
+
+// public function getAllFormData(Request $request)
+// {
+//     try {
+//         $qrBaseUrl = 'https://fivoflow.com/wclm/public/qrcodes/';
+
+//         // Optional filters
+//         $countryId = $request->query('country_id'); // filter by country
+//         $supplierId = $request->query('supplier_id'); // filter by supplier
+//         $lat = $request->query('lat'); // filter by latitude
+//         $lng = $request->query('lng'); // filter by longitude
+//         $radius = $request->query('radius', 10); // default radius 10 km
+
+//         // List of all tables/models
+//         $tables = [
+//             8 => \App\Models\SeedForm::class,
+//             1 => \App\Models\VeterinaryProduct::class,
+//             3 => \App\Models\SyntheticPesticide::class,
+//             7 => \App\Models\MineralFertilizer::class,
+//             4 => \App\Models\OrganicAmendment::class,
+//             6 => \App\Models\InorganicSoilConditioner::class,
+//             2 => \App\Models\AnimalFeed::class,
+//             5 => \App\Models\BioStimulant::class,
+//         ];
+
+//         $data = [];
+
+//         foreach ($tables as $key => $model) {
+//             $query = $model::query()->with('supplier');
+
+//             // Filter by supplier_id
+//             if ($supplierId) {
+//                 $query->where('supplier_id', $supplierId);
+//             }
+
+//             // Filter by country_id via supplier
+//             if ($countryId) {
+//                 $query->whereHas('supplier', function($q) use ($countryId) {
+//                     $q->where('country_id', $countryId);
+//                 });
+//             }
+
+//             // Filter by latitude & longitude within radius (use latitude/longitude columns)
+//             if ($lat && $lng) {
+//                 $query->whereHas('supplier', function($q) use ($lat, $lng, $radius) {
+//                     $q->whereRaw("(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) <= ?", 
+//                         [$lat, $lng, $lat, $radius]);
+//                 });
+//             }
+
+//             $data[$key] = $query->get()->map(function($item) use ($qrBaseUrl) {
+//                 $item->qr_code_url = !empty($item->qr_code_path) 
+//                     ? $qrBaseUrl . basename($item->qr_code_path)
+//                     : null;
+
+//                 // Add supplier info
+//                 if ($item->supplier) {
+//                     $item->supplier_name = $item->supplier->company_name;
+//                     $item->country_id = $item->supplier->country_id;
+//                     $item->latitude = $item->supplier->latitude ?? null;
+//                     $item->longitude = $item->supplier->longitude ?? null;
+//                 }
+
+//                 return $item;
+//             });
+//         }
+
+//         return response()->json([
+//             'status' => true,
+//             'message' => 'All form data fetched successfully',
+//             'data' => $data
+//         ], 200);
+
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Failed to fetch data',
+//             'error' => $e->getMessage()
+//         ], 500);
+//     }
+// }
+
+public function allFilter(Request $request)
+{
+    try {
+        $qrBaseUrl = 'https://fivoflow.com/wclm/public/qrcodes/';
+
+        // ✅ Request params
+        $countryId  = $request->query('country_id');
+        $supplierId = $request->query('supplier_id');
+        $region     = $request->query('region');
+        $priceFrom  = $request->query('price_from');
+        $priceTo    = $request->query('price_to');
+        $yield      = $request->query('yield');
+        $tableId    = $request->query('table_id');
+
+        // ✅ Table mapping
+        $tables = [
+            8 => ['model' => \App\Models\SeedForm::class, 'tastic' => 'seed_form'],
+            1 => ['model' => \App\Models\VeterinaryProduct::class, 'tastic' => 'veterinary'],
+            3 => ['model' => \App\Models\SyntheticPesticide::class, 'tastic' => 'pesticide'],
+            7 => ['model' => \App\Models\MineralFertilizer::class, 'tastic' => 'fertilizer'],
+            4 => ['model' => \App\Models\OrganicAmendment::class, 'tastic' => 'organic'],
+            6 => ['model' => \App\Models\InorganicSoilConditioner::class, 'tastic' => 'conditioner'],
+            2 => ['model' => \App\Models\AnimalFeed::class, 'tastic' => 'feed'],
+            5 => ['model' => \App\Models\BioStimulant::class, 'tastic' => 'bio_stimulant'],
+        ];
+
+        if ($tableId && isset($tables[$tableId])) {
+            $tables = [$tableId => $tables[$tableId]];
+        }
+
+        $data = [];
+
+        foreach ($tables as $key => $info) {
+            $model = $info['model'];
+            $tasticType = $info['tastic'];
+
+            $instance = new $model;
+            $table = $instance->getTable();
+
+            $query = $model::query()
+                ->leftJoin('suppliers as s', 's.id', '=', $table . '.supplier_id')
+                ->leftJoin('price_histories as ph', 'ph.add_product_id', '=', $table . '.id')
+                ->select(
+                    $table . '.*',
+                    'ph.retailPrice',
+                    's.company_name as supplier_name',
+                    's.country_id',
+                    's.region'
+                );
+
+            // ✅ Filters
+            if ($supplierId) $query->where($table . '.supplier_id', $supplierId);
+            if ($countryId) $query->where('s.country_id', $countryId);
+            if ($region) $query->where('s.region', 'LIKE', "%$region%");
+
+            // ✅ Price filter null-safe
+            if ($priceFrom) $query->where(function($q) use ($priceFrom) {
+                $q->whereNull('ph.retailPrice')->orWhere('ph.retailPrice', '>=', $priceFrom);
+            });
+            if ($priceTo) $query->where(function($q) use ($priceTo) {
+                $q->whereNull('ph.retailPrice')->orWhere('ph.retailPrice', '<=', $priceTo);
+            });
+
+            // ✅ Yield filter
+            if ($yield) {
+                $yieldNumeric = preg_replace('/[^0-9.]/', '', $yield);
+                $query->where(function($q) use ($yieldNumeric, $table) {
+                    if (\Schema::hasColumn($table, 'yield')) {
+                        $q->whereRaw("CAST(SUBSTRING_INDEX($table.yield, ' ', 1) AS DECIMAL) = ?", [$yieldNumeric]);
+                    }
+                    if (\Schema::hasColumn($table, 'expected_yield')) {
+                        $q->orWhereRaw("CAST(SUBSTRING_INDEX($table.expected_yield, ' ', 1) AS DECIMAL) = ?", [$yieldNumeric]);
+                    }
+                });
+            }
+
+            $items = $query->get();
+
+            $data[$key] = $items->map(function($item) use ($qrBaseUrl, $tasticType) {
+                $item->tastic_type = $tasticType;
+                $item->qr_code_url = !empty($item->qr_code_path) ? $qrBaseUrl . basename($item->qr_code_path) : null;
+                return $item;
+            });
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Filtered data fetched successfully',
+            'data'    => $data
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status'  => false,
+            'message' => 'Failed to fetch data',
+            'error'   => $e->getMessage()
+        ], 500);
+    }
+}
+
+
+// public function getFormDataById($id, Request $request)
+// {
+//     try {
+//         $qrBaseUrl = 'https://fivoflow.com/wclm/public/qrcodes/';
+//         $supplierId = $request->query('supplier_id');
+//         $agentId = $request->query('agent_id');
+//         $search = $request->query('search'); 
+//         $export = $request->query('export'); // ?export=csv
+
+//         $tables = [
+//             8 => \App\Models\SeedForm::class,
+//             1 => \App\Models\VeterinaryProduct::class,
+//             3 => \App\Models\SyntheticPesticide::class,
+//             7 => \App\Models\MineralFertilizer::class,
+//             4 => \App\Models\OrganicAmendment::class,
+//             6 => \App\Models\InorganicSoilConditioner::class,
+//             2 => \App\Models\AnimalFeed::class,
+//             5 => \App\Models\BioStimulant::class,
+//         ];
+
+//         if (!isset($tables[$id])) {
+//             return response()->json([
+//                 'status' => false,
+//                 'message' => 'No table mapped for this ID'
+//             ], 404);
+//         }
+
+//         $model = $tables[$id];
+//         $tableName = (new $model)->getTable();
+//         $columns = \Schema::getColumnListing($tableName); // ✅ get all table columns dynamically
+
+//         $query = $model::query();
+//         if (!empty($supplierId)) $query->where('supplier_id', $supplierId);
+//         if (!empty($agentId)) $query->where('agent_id', $agentId);
+
+//         if (!empty($search)) {
+//             $query->where(function($q) use ($search, $columns) {
+//                 foreach ($columns as $field) {
+//                     $q->orWhere($field, 'LIKE', "%$search%");
+//                 }
+//             });
+//         }
+
+//         $items = $query->get()->map(function ($item) use ($qrBaseUrl) {
+//             $item->qr_code_url = !empty($item->qr_code_path)
+//                 ? $qrBaseUrl . basename($item->qr_code_path)
+//                 : null;
+//             return $item;
+//         });
+
+//         // ✅ CSV export if requested
+//         if (!empty($export) && $export === 'csv') {
+//             $fileName = 'form_data_' . $id . '_' . time() . '.csv';
+//             $localPath = storage_path('app/' . $fileName);
+
+//             $output = fopen($localPath, 'w');
+
+//             // Header: all columns + QR Code URL
+//             fputcsv($output, array_merge($columns, ['qr_code_url']));
+
+//             // Data rows
+//             foreach ($items as $item) {
+//                 $row = [];
+//                 foreach ($columns as $field) $row[] = $item->$field ?? '';
+//                 $row[] = $item->qr_code_url ?? '';
+//                 fputcsv($output, $row);
+//             }
+
+//             fclose($output);
+
+//             // FTP upload
+//             $ftp_server = "173.201.186.254";
+//             $ftp_user = "lokesh@fivoflow.com";
+//             $ftp_pass = "gbvvr#R_7=S*";
+//             $ftp_dir = "/wclm/public/exportfile";
+
+//             $conn = ftp_connect($ftp_server) or die("Could not connect to FTP server");
+//             $login = ftp_login($conn, $ftp_user, $ftp_pass);
+//             ftp_pasv($conn, true);
+//             @ftp_mkdir($conn, $ftp_dir);
+//             $ftp_path = $ftp_dir . "/" . $fileName;
+
+//             if (ftp_put($conn, $ftp_path, $localPath, FTP_ASCII)) {
+//                 $ftp_status = "CSV uploaded successfully!";
+//             } else {
+//                 $ftp_status = "Error uploading CSV.";
+//             }
+
+//             ftp_close($conn);
+//             unlink($localPath);
+
+//             return response()->json([
+//                 'status' => true,
+//                 'message' => $ftp_status,
+//                 'ftp_path' => $ftp_path
+//             ]);
+//         }
+
+//         // Normal JSON response
+//         return response()->json([
+//             'status' => true,
+//             'message' => 'Form data fetched successfully',
+//             'data' => $items
+//         ], 200);
+
+//     } catch (\Exception $e) {
+//         return response()->json([
+//             'status' => false,
+//             'message' => 'Failed to fetch data',
+//             'error' => $e->getMessage()
+//         ], 500);
+//     }
+// }
+public function getFormDataById($id, Request $request)
+{
+    try {
+        $qrBaseUrl = 'https://fivoflow.com/wclm/public/qrcodes/';
+
+        $supplierId = $request->query('supplier_id');
+        $search     = $request->query('search'); 
+        $export     = $request->query('export'); // ?export=csv
+
+        $tables = [
+            8 => \App\Models\SeedForm::class,
+            1 => \App\Models\VeterinaryProduct::class,
+            3 => \App\Models\SyntheticPesticide::class,
+            7 => \App\Models\MineralFertilizer::class,
+            4 => \App\Models\OrganicAmendment::class,
+            6 => \App\Models\InorganicSoilConditioner::class,
+            2 => \App\Models\AnimalFeed::class,
+            5 => \App\Models\BioStimulant::class,
+        ];
+
+        if (!isset($tables[$id])) {
+            return response()->json([
+                'status' => false,
+                'message' => 'No table mapped for this ID'
+            ], 404);
+        }
+
+        $model = $tables[$id];
+        $tableName = (new $model)->getTable();
+        $columns = \Schema::getColumnListing($tableName);
+
+        $query = $model::query();
+
+        if (!empty($supplierId)) {
+            $query->where('supplier_id', $supplierId);
+        }
+
+        if (!empty($search)) {
+            $query->where(function($q) use ($search, $columns) {
+                foreach ($columns as $field) {
+                    $q->orWhere($field, 'LIKE', "%$search%");
+                }
+            });
+        }
+
+        $items = $query->get()->map(function ($item) use ($qrBaseUrl) {
+
+            // ⭐ FAVORITE CHECK (MATCH ONLY product_id + product_row_id)
+            $favorite = \App\Models\ProductLike::where('product_id', $item->product_id ?? null)
+                ->where('product_row_id', $item->id)
+                ->first();
+
+            $item->like_status = $favorite ? 1 : 0;
+
+            // ⭐ QR Code URL
+            $item->qr_code_url = !empty($item->qr_code_path)
+                ? $qrBaseUrl . basename($item->qr_code_path)
+                : null;
+
+            return $item;
+        });
+
+        // ⭐ CSV EXPORT
+        if (!empty($export) && $export === 'csv') {
+
+            $fileName = 'form_data_' . $id . '_' . time() . '.csv';
+            $localPath = storage_path('app/' . $fileName);
+
+            $output = fopen($localPath, 'w');
+
+            fputcsv($output, array_merge($columns, ['like_status', 'qr_code_url']));
+
+            foreach ($items as $item) {
+                $row = [];
+                foreach ($columns as $field) {
+                    $row[] = $item->$field ?? '';
+                }
+                $row[] = $item->like_status;
+                $row[] = $item->qr_code_url ?? '';
+                fputcsv($output, $row);
+            }
+
+            fclose($output);
+
+            // ⭐ FTP UPLOAD
+            $ftp_server = "173.201.186.254";
+            $ftp_user   = "lokesh@fivoflow.com";
+            $ftp_pass   = "gbvvr#R_7=S*";
+            $ftp_dir    = "/wclm/public/exportfile";
+
+            $conn = ftp_connect($ftp_server);
+            $login = ftp_login($conn, $ftp_user, $ftp_pass);
+            ftp_pasv($conn, true);
+            @ftp_mkdir($conn, $ftp_dir);
+
+            $ftp_path = $ftp_dir . "/" . $fileName;
+
+            ftp_put($conn, $ftp_path, $localPath, FTP_ASCII);
+
+            ftp_close($conn);
+            unlink($localPath);
+
+            return response()->json([
+                'status'   => true,
+                'message'  => 'CSV uploaded successfully',
+                'ftp_path' => $ftp_path
+            ]);
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => 'Form data fetched successfully',
+            'data'    => $items
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to fetch data',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
+
+public function getAllFormsBySupplier($supplier_id)
+{
+    try {
+        $qrBaseUrl = 'https://fivoflow.com/wclm/public/qrcodes/';
+
+        $tables = [
+            8 => \App\Models\SeedForm::class,
+            1 => \App\Models\VeterinaryProduct::class,
+            3 => \App\Models\SyntheticPesticide::class,
+            7 => \App\Models\MineralFertilizer::class,
+            4 => \App\Models\OrganicAmendment::class,
+            6 => \App\Models\InorganicSoilConditioner::class,
+            2 => \App\Models\AnimalFeed::class,
+            5 => \App\Models\BioStimulant::class,
+        ];
+
+        $data = [];
+
+        foreach ($tables as $key => $model) {
+
+            $table = (new $model)->getTable();
+
+            if (\Schema::hasColumn($table, 'supplier_id')) {
+
+                $records = $model::where('supplier_id', $supplier_id)
+                    ->get()
+                    ->map(function ($item) use ($qrBaseUrl) {
+                        $item->qr_code_url = !empty($item->qr_code_path)
+                            ? $qrBaseUrl . basename($item->qr_code_path)
+                            : null;
+                        return $item;
+                    });
+
+                if ($records->isNotEmpty()) {
+                    $data[$key] = $records;
+                }
+            }
+        }
+
+        // ✅ No data found response
+        if (empty($data)) {
+            return response()->json([
+                'status'  => false,
+                'message' => "No form data found for supplier_id = {$supplier_id}",
+                'data'    => []
+            ], 404);
+        }
+
+        // ✅ Success response
+        return response()->json([
+            'status'  => true,
+            'message' => "Form data fetched successfully for supplier_id = {$supplier_id}",
+            'data'    => $data
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status'  => false,
+            'message' => 'Failed to fetch data',
+            'error'   => $e->getMessage()
+        ], 500);
+    }
+}
+
+public function getSupplierForms($supplier_id, Request $request)
+{
+    try {
+        // ✅ Step 1: Supplier Info
+        $supplier = \App\Models\Supplier::find($supplier_id);
+
+        if (!$supplier) {
+            return response()->json([
+                'status' => false,
+                'message' => "Supplier not found with ID {$supplier_id}"
+            ], 404);
+        }
+
+        $qrBaseUrl = 'https://fivoflow.com/wclm/public/qrcodes/';
+        $export = $request->query('export'); // ?export=csv
+        $productId = $request->query('product_id'); // ?product_id=123
+
+        // ✅ Step 2: All product tables mapped
+        $tables = [
+            'seeds' => \App\Models\SeedForm::class,
+            'veterinary_products' => \App\Models\VeterinaryProduct::class,
+            'synthetic_pesticides' => \App\Models\SyntheticPesticide::class,
+            'mineral_fertilizers' => \App\Models\MineralFertilizer::class,
+            'organic_amendments' => \App\Models\OrganicAmendment::class,
+            'inorganic_soil_conditioners' => \App\Models\InorganicSoilConditioner::class,
+            'animal_feeds' => \App\Models\AnimalFeed::class,
+            'biostimulants' => \App\Models\BioStimulant::class,
+        ];
+
+        $forms = [];
+
+        // ✅ Step 3: Collect all supplier forms from each table
+        foreach ($tables as $key => $model) {
+            $table = (new $model)->getTable();
+
+            if (\Schema::hasColumn($table, 'supplier_id')) {
+                // Start query
+                $query = $model::where('supplier_id', $supplier_id);
+
+                // If product_id is provided, filter by it
+                if (!empty($productId) && \Schema::hasColumn($table, 'product_id')) {
+                    $query->where('product_id', $productId);
+                }
+
+                $records = $query->get()->map(function ($item) use ($qrBaseUrl) {
+                    $item->qr_code_url = !empty($item->qr_code_path)
+                        ? $qrBaseUrl . basename($item->qr_code_path)
+                        : null;
+                    return $item;
+                });
+
+                $forms[$key] = $records;
+            }
+        }
+
+        // ✅ Step 4: CSV Export logic
+        if (!empty($export) && $export === 'csv') {
+            $fileName = 'supplier_forms_' . $supplier_id . '_' . time() . '.csv';
+            $localPath = storage_path('app/' . $fileName);
+
+            $output = fopen($localPath, 'w');
+
+            foreach ($forms as $tableName => $records) {
+                if ($records->isEmpty()) continue;
+
+                fputcsv($output, []);
+                fputcsv($output, ["===== {$tableName} ====="]);
+
+                $columns = \Schema::getColumnListing((new $tables[$tableName])->getTable());
+                $columns[] = 'qr_code_url';
+                fputcsv($output, $columns);
+
+                foreach ($records as $record) {
+                    $row = [];
+                    foreach ($columns as $col) {
+                        $row[] = $record->$col ?? '';
+                    }
+                    fputcsv($output, $row);
+                }
+            }
+
+            fclose($output);
+
+            // ✅ FTP Upload Section
+            $ftp_server = "173.201.186.254";
+            $ftp_user = "lokesh@fivoflow.com";
+            $ftp_pass = "gbvvr#R_7=S*";
+            $ftp_dir = "/wclm/public/exportfile";
+
+            $conn = ftp_connect($ftp_server) or die("Could not connect to FTP server");
+            $login = ftp_login($conn, $ftp_user, $ftp_pass);
+            ftp_pasv($conn, true);
+            @ftp_mkdir($conn, $ftp_dir);
+            $ftp_path = $ftp_dir . "/" . $fileName;
+
+            $ftp_status = ftp_put($conn, $ftp_path, $localPath, FTP_ASCII)
+                ? "CSV uploaded successfully!"
+                : "Error uploading CSV.";
+
+            ftp_close($conn);
+            unlink($localPath);
+
+            // ✅ Public download URL
+            $publicUrl = 'https://fivoflow.com/wclm/public/exportfile/' . $fileName;
+
+            return response()->json([
+                'status' => true,
+                'message' => $ftp_status,
+                'public_url' => $publicUrl,
+                'export_path' => $ftp_path,
+                'filter_used' => [
+                    'supplier_id' => $supplier_id,
+                    'product_id' => $productId,
+                ]
+            ]);
+        }
+
+        // ✅ Step 5: Normal JSON response
+        return response()->json([
+            'status' => true,
+            'message' => "Forms fetched successfully for supplier_id = {$supplier_id}" . ($productId ? " and product_id = {$productId}" : ''),
+            'supplier' => $supplier,
+            'filters' => [
+                'supplier_id' => $supplier_id,
+                'product_id' => $productId,
+            ],
+            'forms' => $forms
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to fetch data',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
+
+
+public function getAllFormsByAgent($agent_id)
+{
+    try {
+        $qrBaseUrl = 'https://fivoflow.com/wclm/public/qrcodes/';
+
+        $tables = [
+            8 => \App\Models\SeedForm::class,
+            1 => \App\Models\VeterinaryProduct::class,
+            3 => \App\Models\SyntheticPesticide::class,
+            7 => \App\Models\MineralFertilizer::class,
+            4 => \App\Models\OrganicAmendment::class,
+            6 => \App\Models\InorganicSoilConditioner::class,
+            2 => \App\Models\AnimalFeed::class,
+            5 => \App\Models\BioStimulant::class,
+        ];
+
+        $data = [];
+
+        foreach ($tables as $key => $model) {
+            if (\Schema::hasColumn((new $model)->getTable(), 'agent_id')) {
+                $records = $model::where('agent_id', $agent_id)->get()->map(function ($item) use ($qrBaseUrl) {
+                    $item->qr_code_url = !empty($item->qr_code_path)
+                        ? $qrBaseUrl . basename($item->qr_code_path)
+                        : null;
+                    return $item;
+                });
+
+                if ($records->isNotEmpty()) {
+                    $data[$key] = $records;
+                }
+            }
+        }
+
+        return response()->json([
+            'status'  => true,
+            'message' => "Form data fetched successfully for agent_id = {$agent_id}",
+            'data'    => $data
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status'  => false,
+            'message' => 'Failed to fetch data',
+            'error'   => $e->getMessage()
+        ], 500);
+    }
+}
+
+public function searchAllForms(Request $request)
+{
+    try {
+        $search = $request->query('search');
+        $qrBaseUrl = 'https://fivoflow.com/wclm/public/qrcodes/';
+
+        if (empty($search)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Search keyword required'
+            ], 400);
+        }
+
+        // ✅ All models list
+        $tables = [
+            8 => \App\Models\SeedForm::class,
+            1 => \App\Models\VeterinaryProduct::class,
+            3 => \App\Models\SyntheticPesticide::class,
+            7 => \App\Models\MineralFertilizer::class,
+            4 => \App\Models\OrganicAmendment::class,
+            6 => \App\Models\InorganicSoilConditioner::class,
+            2 => \App\Models\AnimalFeed::class,
+            5 => \App\Models\BioStimulant::class,
+        ];
+
+        // ✅ Search fields for each model
+        $searchFields = [
+            2 => ['Typeoffeed'],                                // animal_feeds ✅ confirmed
+            5 => ['biostimulant_product', 'action_mode'],       // bio_stimulants
+            6 => ['trade_name', 'raw_material'],                // inorganic_soil_conditioners
+            7 => ['trade_name', 'fertilizer_type'],             // mineral_fertilizers
+            4 => ['trade_name', 'bio_label'],                   // organic_amendments
+            8 => ['cropName', 'breederName'],                   // seed_forms
+            3 => ['trade_name', 'other_function'],              // synthetic_pesticides
+            1 => ['product_name', 'manufacturing_lab'],         // veterinary_products
+        ];
+
+        $finalResult = [];
+
+        foreach ($tables as $id => $model) {
+            $query = $model::query();
+
+            if (isset($searchFields[$id])) {
+                $fields = $searchFields[$id];
+
+                $query->where(function($q) use ($search, $fields, $model) {
+                    foreach ($fields as $field) {
+                        if (\Schema::hasColumn((new $model)->getTable(), $field)) {
+                            $q->orWhere($field, 'LIKE', "%$search%");
+                        }
+                    }
+                });
+
+                $records = $query->get()->map(function ($item) use ($qrBaseUrl, $id) {
+                    $item->form_id = $id;
+                    $item->qr_code_url = !empty($item->qr_code_path)
+                        ? $qrBaseUrl . basename($item->qr_code_path)
+                        : null;
+                    return $item;
+                });
+
+                if ($records->count() > 0) {
+                    $finalResult = array_merge($finalResult, $records->toArray());
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Search results fetched successfully',
+            'data' => $finalResult
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Failed to search data',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+public function updateProductStatus(Request $request)
+{
+    // Validate input
+    $request->validate([
+        'table_id'    => 'required|integer',
+        'product_id'  => 'required|integer',
+        'agent_id'    => 'required|integer',
+        'supplier_id' => 'nullable|integer',
+        'status_id'   => 'required|integer'
+    ]);
+
+    // Table mapping
+    $tables = [
+        8 => \App\Models\SeedForm::class,
+        1 => \App\Models\VeterinaryProduct::class,
+        3 => \App\Models\SyntheticPesticide::class,
+        7 => \App\Models\MineralFertilizer::class,
+        4 => \App\Models\OrganicAmendment::class,
+        6 => \App\Models\InorganicSoilConditioner::class,
+        2 => \App\Models\AnimalFeed::class,
+        5 => \App\Models\BioStimulant::class,
+    ];
+
+    if (!array_key_exists($request->table_id, $tables)) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Invalid table_id'
+        ], 400);
+    }
+
+    $model = $tables[$request->table_id];
+
+    // Product find with ONLY product_id + agent_id
+    $product = $model::where('id', $request->product_id)
+                     ->where('agent_id', $request->agent_id)
+                     ->first();
+
+    if (!$product) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Product not found for this agent'
+        ], 404);
+    }
+
+    // Update status and supplier_id if provided
+    $product->status_id = $request->status_id;
+    
+    // supplier_id update only if provided
+    if ($request->filled('supplier_id')) {
+        $product->supplier_id = $request->supplier_id;
+    }
+
+    $product->save();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Product status updated successfully',
+        'product' => $product
+    ]);
+}
+
+
+
+
+}

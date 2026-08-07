@@ -1,0 +1,4 @@
+
+"===== seeds ====="
+id,form_type,title,product_id,language_id,qr_code_path,cropName,verityName,breederName,countryOrigin,registrationNumber,varietyType,seedCategory,precocity,fruitColor,fruitShape,leafLength,leafColor,plantHeight,plantHabit,bioticResistance,abioticResistance,InherentNutritionalValue,other,yield,otherRecommendations,otherRecommendationsPhoto,wholesalePrice,semiwholesalePrice,retailPrice,supplier_id,agent_id,created_by,created_at,updated_at,qr_code_url
+84,seed_form,seed,8,1,,seed,oil,rosted,inida,up,Hybrid,1,red,l,res,10,10,10,rhizomatous,12,12,"Rich in Beta-carotene",1,1,1,seed_photos/mKAUXJ9bm2zGtIrPIhWP3K3L99aZNuEAw1LuvGb0.png,1.00,11.00,1.00,72,,1,"2025-11-05 12:03:18","2025-11-05 12:03:18",

@@ -1,0 +1,1448 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class FormStructureController extends Controller
+{
+    /**
+     * GET /api/forms/{seed_id}
+     * Returns form structure based on seed_id
+     */
+    public function getFormBySeed($seed_id)
+    {
+        // Seed ID के हिसाब से form choose करना
+        switch ($seed_id) {
+            case 1: // Veterinary Products
+                $form = $this->veterinaryProductsForm($seed_id);
+                $form_type = "veterinary-products";
+                break;
+            case 2: // Animal Feed
+                $form = $this->feedForm($seed_id);
+                $form_type = "feed-form";
+                break;
+            case 3: // Synthetic Pesticides
+                $form = $this->syntheticPesticidesForm($seed_id);
+                $form_type = "synthetic-pesticides";
+                break;
+            case 4: // Inorganic Soil Conditioners
+                $form = $this->inorganicSoilConditionersForm($seed_id);
+                $form_type = "inorganic-soil-conditioners";
+                break;
+            case 5: // Biostimulants
+                $form = $this->biostimulantsForm($seed_id);
+                $form_type = "biostimulants";
+                break;
+            case 6: // Organic Amendments
+                $form = $this->organicAmendments($seed_id);
+                $form_type = "organic-amendments";
+                break;
+            case 7: // Mineral Fertilizers
+                $form = $this->fertilizerForm($seed_id);
+                $form_type = "fertilizer-form";
+                break;
+            case 8: // Seeds
+                $form = $this->seedDetailsForm($seed_id);
+                $form_type = "seed-details";
+                break;
+            default:
+                return response()->json([
+                    "success" => false,
+                    "message" => "Form not found for seed_id $seed_id"
+                ], 404);
+        }
+
+        return response()->json([
+            "success" => true,
+            "seed_id" => $seed_id,
+            "form_type" => $form_type,
+            "data" => $form
+        ]);
+    }
+
+    private function fertilizerForm($seed_id)
+{
+    return [
+        [
+            "key" => "fertilizer_type",
+            "label" => "Type of fertilizer*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Example: 15-15-15"
+        ],
+        [
+            "key" => "fertilizer_registration",
+            "label" => "Registration number*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter registration number"
+        ],
+        [
+            "key" => "physical_form",
+            "label" => "Physical form*",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => true,
+            "options" => ["Liquid","Solid granules","Powder"],
+            "placeholder" => "Select physical form"
+        ],
+        [
+            "key" => "trade_name",
+            "label" => "Trade name (Urea, NPK, TSP, KCI, etc.)",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter trade name"
+        ],
+        [
+            "key" => "n",
+            "label" => "% N",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % N"
+        ],
+        [
+            "key" => "p2",
+            "label" => "% P₂O₅",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % P₂O₅"
+        ],
+        [
+            "key" => "k2",
+            "label" => "% K₂O",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % K₂O"
+        ],
+        [
+            "key" => "zn",
+            "label" => "% Zn",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % Zn"
+        ],
+        [
+            "key" => "ca",
+            "label" => "% Ca",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % Ca"
+        ],
+        [
+            "key" => "mg",
+            "label" => "% Mg",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % Mg"
+        ],
+        [
+            "key" => "s",
+            "label" => "% S",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % S"
+        ],
+        [
+            "key" => "b",
+            "label" => "% B",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % B"
+        ],
+        [
+            "key" => "mo",
+            "label" => "% Mo",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % Mo"
+        ],
+        [
+            "key" => "application_rate",
+            "label" => "Application rate per hectare",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter application rate"
+        ],
+        [
+            "key" => "fertilizer_wholesale_price",
+            "label" => "Average wholesale prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter wholesale price"
+        ],
+        [
+            "key" => "fertilizer_semiwholesale_price",
+            "label" => "Average semi-wholesalers price by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter semi-wholesale price"
+        ],
+        [
+            "key" => "fertilizer_retail_price",
+            "label" => "Average retail prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter retail price"
+        ],
+        [
+            "key" => "seed_id",
+            "label" => "Seed ID",
+            "value" => $seed_id,
+            "inputType" => "hidden",
+            "required" => true,
+            "placeholder" => "Seed ID hidden field"
+        ],
+        [
+            "key" => "supplier_id",
+            "label" => "Supplier ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Supplier ID hidden field"
+        ],
+        [
+            "key" => "agent_id",
+            "label" => "Agent ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Agent ID hidden field"
+        ],
+        [
+            "key" => "created_by",
+            "label" => "Created By",
+            "value" => 1,
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Created by hidden field"
+        ]
+    ];
+}
+
+    private function organicAmendments($seed_id)
+{
+    return [
+        [
+            "key" => "organic_type",
+            "label" => "Type of organic amendment*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Compost, vermicompost, bokashi, etc"
+        ],
+        [
+            "key" => "physical_form",
+            "label" => "Physical form*",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => true,
+            "options" => ["Liquid", "Solid granules", "Powder"],
+            "placeholder" => "Select physical form"
+        ],
+        [
+            "key" => "trade_name",
+            "label" => "Trade name",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter trade name"
+        ],
+        [
+            "key" => "country_origin",
+            "label" => "Country of origin",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter country of origin"
+        ],
+        [
+            "key" => "bio_label",
+            "label" => "Bio label name if applicable",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter bio label name"
+        ],
+        [
+            "key" => "n",
+            "label" => "% N",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % N"
+        ],
+        [
+            "key" => "p2",
+            "label" => "% P₂O₅",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % P₂O₅"
+        ],
+        [
+            "key" => "k2",
+            "label" => "% K₂O",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % K₂O"
+        ],
+        [
+            "key" => "cao",
+            "label" => "% CaO",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % CaO"
+        ],
+        [
+            "key" => "mgo",
+            "label" => "% MgO",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter % MgO"
+        ],
+        [
+            "key" => "cn_ratio",
+            "label" => "C/N ratio",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter C/N ratio"
+        ],
+        [
+            "key" => "raw_material",
+            "label" => "Raw material",
+            "value" => [],
+            "inputType" => "checkbox",
+            "required" => false,
+            "options" => [
+                "Crop residues",
+                "Agro-industrial by-products",
+                "Slurry",
+                "Liquide manure",
+                "Solid animal manure"
+            ],
+            "placeholder" => "Select raw materials"
+        ],
+        [
+            "key" => "raw_material_other",
+            "label" => "Other raw material",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Specify other raw material"
+        ],
+        [
+            "key" => "arsenic_content",
+            "label" => "Arsenic content less than 10 mg/kg",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => ["Yes", "No"],
+            "placeholder" => "Select option"
+        ],
+        [
+            "key" => "cadmium_content",
+            "label" => "Cadmium content less than 5 mg/kg",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => ["Yes", "No"],
+            "placeholder" => "Select option"
+        ],
+        [
+            "key" => "cromium_content",
+            "label" => "Cromium content less than 50 mg/kg",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => ["Yes", "No"],
+            "placeholder" => "Select option"
+        ],
+        [
+            "key" => "copper_content",
+            "label" => "Copper content less than 300 mg/kg",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => ["Yes", "No"],
+            "placeholder" => "Select option"
+        ],
+        [
+            "key" => "lead_content",
+            "label" => "Lead content less than 100 mg/kg",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => ["Yes", "No"],
+            "placeholder" => "Select option"
+        ],
+        [
+            "key" => "wholesale_price",
+            "label" => "Average wholesale prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter wholesale price"
+        ],
+        [
+            "key" => "semiwholesale_price",
+            "label" => "Average semi-wholesalers price by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter semi-wholesale price"
+        ],
+        [
+            "key" => "retail_price",
+            "label" => "Average retail prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter retail price"
+        ],
+        [
+            "key" => "seed_id",
+            "label" => "Seed ID",
+            "value" => $seed_id,
+            "inputType" => "hidden",
+            "required" => true,
+            "placeholder" => "Seed ID hidden field"
+        ],
+        [
+            "key" => "supplier_id",
+            "label" => "Supplier ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Supplier ID hidden field"
+        ],
+        [
+            "key" => "agent_id",
+            "label" => "Agent ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Agent ID hidden field"
+        ],
+        [
+            "key" => "created_by",
+            "label" => "Created By",
+            "value" => 1,
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Created by hidden field"
+        ]
+    ];
+}
+
+
+private function feedForm($seed_id)
+{
+    return [
+        [
+            "key" => "Typeoffeed",
+            "label" => "Type of Feed",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => true,
+            "options" => ["Chick start","Chicken","Layers","Chair","All ruminants","Dairy cow","Filling","Equid","Pigs","Other"],
+            "placeholder" => "Select type of feed"
+        ],
+        [
+            "key" => "afrm",
+            "label" => "Raw Materials",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Inputs used in the production of animal feed."
+        ],
+        [
+            "key" => "afPhysicalform",
+            "label" => "Physical form (Pellets, Flour, Crumbs)",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => true,
+            "options" => ["Pellet","Flour","Crumb"],
+            "placeholder" => "Select physical form"
+        ],
+        [
+            "key" => "afdm",
+            "label" => "% Dry Matter (DM)",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter % dry matter"
+        ],
+        [
+            "key" => "afEnergy",
+            "label" => "% Energy (UF, kcal)",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter % energy"
+        ],
+        [
+            "key" => "afcp",
+            "label" => "% Crude Protein",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter % crude protein"
+        ],
+        [
+            "key" => "afsp",
+            "label" => "Storage Period",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter storage period"
+        ],
+        [
+            "key" => "affs",
+            "label" => "Feed Supplements",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter feed supplements"
+        ],
+        [
+            "key" => "afWholesalePrice",
+            "label" => "Average wholesale prices by packaging type*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter wholesale price"
+        ],
+        [
+            "key" => "afsemiwholesalePrice",
+            "label" => "Average semi-wholesalers price by packaging typе*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter semi-wholesale price"
+        ],
+        [
+            "key" => "afretailPrice",
+            "label" => "Average retail prices by packaging type*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter retail price"
+        ],
+        [
+            "key" => "supplier_id",
+            "label" => "Supplier ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Supplier ID hidden field"
+        ],
+        [
+            "key" => "agent_id",
+            "label" => "Agent ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Agent ID hidden field"
+        ],
+        [
+            "key" => "created_by",
+            "label" => "Created By",
+            "value" => 1,
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Created by hidden field"
+        ],
+        [
+            "key" => "seed_id",
+            "label" => "Seed ID",
+            "value" => $seed_id,
+            "inputType" => "hidden",
+            "required" => true,
+            "placeholder" => "Seed ID hidden field"
+        ]
+    ];
+}
+
+
+   private function seedDetailsForm($seed_id)
+{
+    return [
+        [
+            "key" => "supplier_id",
+            "label" => "Supplier ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Supplier ID hidden field"
+        ],
+        [
+            "key" => "seed_id",
+            "label" => "Seed ID",
+            "value" => $seed_id,
+            "inputType" => "hidden",
+            "required" => true,
+            "placeholder" => "Seed ID hidden field"
+        ],
+        [
+            "key" => "agent_id",
+            "label" => "Agent ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Agent ID hidden field"
+        ],
+        [
+            "key" => "created_by",
+            "label" => "Created By",
+            "value" => 1,
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Created by hidden field"
+        ],
+        [
+            "key" => "cropName",
+            "label" => "Crop Name",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter crop name"
+        ],
+        [
+            "key" => "verityName",
+            "label" => "Variety Name",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter variety name"
+        ],
+        [
+            "key" => "breederName",
+            "label" => "Breeder's Name",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter breeder's name"
+        ],
+        [
+            "key" => "countryOrigin",
+            "label" => "Country of Origin",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter country of origin"
+        ],
+        [
+            "key" => "registrationNumber",
+            "label" => "Registration Number",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter registration number"
+        ],
+        [
+            "key" => "varietyType",
+            "label" => "Type of Variety",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => ["Hybrid", "selfPollinated", "openPollinatedVariety"],
+            "placeholder" => "Select type of variety"
+        ],
+        [
+            "key" => "seedCategory",
+            "label" => "Seed Category",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Example: Breeder, foundation, certified, commercial"
+        ],
+        [
+            "key" => "precocity",
+            "label" => "Precocity",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Number of days from sowing to ripening"
+        ],
+        [
+            "key" => "fruitColor",
+            "label" => "Fruit Color",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter fruit color"
+        ],
+        [
+            "key" => "fruitShape",
+            "label" => "Fruit Shape",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Example: Oval, Globular, Round, Semi-flattened"
+        ],
+        [
+            "key" => "leafLength",
+            "label" => "Leaf Length",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter leaf length"
+        ],
+        [
+            "key" => "leafColor",
+            "label" => "Leaf Color",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Example: Dark green, Light green"
+        ],
+        [
+            "key" => "plantHeight",
+            "label" => "Plant Height (cm)",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter plant height"
+        ],
+        [
+            "key" => "plantHabit",
+            "label" => "Plant Habit",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => ["erected", "semiErect", "bushy", "virgate", "intracate", "divaricate", "suckers", "coppiceShoots", "lignotuber", "epiphytes", "decumbent", "procumbent", "prostrate", "stoloniferous", "rhizomatous", "pendent"],
+            "placeholder" => "Select plant habit"
+        ],
+        [
+            "key" => "bioticResistance",
+            "label" => "Biotic Resistance",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Specific resistance/tolerance to biotic factors"
+        ],
+        [
+            "key" => "abioticResistance",
+            "label" => "Abiotic Resistance",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Specific resistance/tolerance to abiotic factors"
+        ],
+        [
+            "key" => "InherentNutritionalValue",
+            "label" => "Inherent Nutritional Value",
+            "value" => [],
+            "inputType" => "checkbox",
+            "required" => false,
+            "options" => ["Rich in Beta-carotene", "Rich in vitamin C", "Rich in Iron", "Rich in Antioxidant", "Other"],
+            "placeholder" => "Select nutritional values"
+        ],
+        [
+            "key" => "other",
+            "label" => "Other",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Other relevant information"
+        ],
+        [
+            "key" => "yield",
+            "label" => "Yield (t/ha)",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter yield"
+        ],
+        [
+            "key" => "otherRecommendations",
+            "label" => "Other recommendations (in text)",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter other recommendations"
+        ],
+        [
+            "key" => "otherRecommendationsPhoto",
+            "label" => "Other recommendations (photo of any support documents)",
+            "value" => "",
+            "inputType" => "file",
+            "required" => false,
+            "placeholder" => "Upload photo"
+        ],
+        [
+            "key" => "wholesalePrice",
+            "label" => "Average wholesale prices by packaging type*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter wholesale price"
+        ],
+        [
+            "key" => "semiwholesalePrice",
+            "label" => "Average semi-wholesalers price by packaging type*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter semi-wholesale price"
+        ],
+        [
+            "key" => "retailPrice",
+            "label" => "Average retail prices by packaging type*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter retail price"
+        ]
+    ];
+}
+
+
+
+    // Placeholder methods for other forms (add actual fields as needed)
+private function veterinaryProductsForm($seed_id)
+{
+    return [
+        [
+            "key" => "product_name",
+            "label" => "Veterinary product name*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter veterinary product name"
+        ],
+        [
+            "key" => "manufacturing_lab",
+            "label" => "Name of manufacturing laboratory",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Information on the lab that markets the product Bayer, Zeotis, etc."
+        ],
+        [
+            "key" => "active_substance",
+            "label" => "Active substance",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter active substance"
+        ],
+        [
+            "key" => "registration_number",
+            "label" => "Registration Number*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter registration number"
+        ],
+        [
+            "key" => "therapeutic_class",
+            "label" => "Therapeutic class",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => ["Pest control", "Antibiotics", "Vaccines", "Other"],
+            "placeholder" => "Select therapeutic class"
+        ],
+        [
+            "key" => "other_therapeutic_class",
+            "label" => "Other therapeutic class",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Specify other therapeutic class if any"
+        ],
+        [
+            "key" => "dosage",
+            "label" => "Dosage",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter dosage"
+        ],
+        [
+            "key" => "pharmaceutical_form",
+            "label" => "Pharmaceutical form",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter pharmaceutical form"
+        ],
+        [
+            "key" => "route_of_administration",
+            "label" => "Route of administration",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter route of administration"
+        ],
+        [
+            "key" => "targeted_animals",
+            "label" => "Targeted animals",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter targeted animals"
+        ],
+        [
+            "key" => "waiting_period",
+            "label" => "Waiting period",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter waiting period"
+        ],
+        [
+            "key" => "expiry_date",
+            "label" => "Expiry date",
+            "value" => "",
+            "inputType" => "date",
+            "required" => false,
+            "placeholder" => "Select expiry date"
+        ],
+        [
+            "key" => "transport_storage_requirements",
+            "label" => "Transport and storage requirements",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Temperature vaccines, do not expose to sunlight,...."
+        ],
+        [
+            "key" => "wholesale_price",
+            "label" => "Average wholesale prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter wholesale price"
+        ],
+        [
+            "key" => "semiwholesale_price",
+            "label" => "Average semi-wholesalers price by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter semi-wholesale price"
+        ],
+        [
+            "key" => "retail_price",
+            "label" => "Average retail prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter retail price"
+        ],
+        [
+            "key" => "seed_id",
+            "label" => "Seed ID",
+            "value" => $seed_id,
+            "inputType" => "hidden",
+            "required" => true,
+            "placeholder" => "Seed ID hidden field"
+        ],
+        [
+            "key" => "supplier_id",
+            "label" => "Supplier ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Supplier ID hidden field"
+        ],
+        [
+            "key" => "agent_id",
+            "label" => "Agent ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Agent ID hidden field"
+        ],
+        [
+            "key" => "created_by",
+            "label" => "Created By",
+            "value" => 1,
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Created by hidden field"
+        ]
+    ];
+}
+private function syntheticPesticidesForm($seed_id)
+{
+    return [
+        [
+            "key" => "trade_name",
+            "label" => "Trade name*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Example: PACHA 25 EC"
+        ],
+        [
+            "key" => "active_ingredient",
+            "label" => "Active ingredient(s)",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => [
+                "- Deltamethrin 24 g/l",
+                "+ Acetamiprid 32 g/1",
+                "- Glyphosate 360g/l",
+                "Other"
+            ],
+            "placeholder" => "Select active ingredient"
+        ],
+        [
+            "key" => "other_ingredient",
+            "label" => "Other active ingredients",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Specify other active ingredients"
+        ],
+        [
+            "key" => "formulation",
+            "label" => "Formulation",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => [
+                "A: Aerosol",
+                "D or DU Dust or powder",
+                "E or EC: Emulsifiable concentrate",
+                "F: Fluid paste",
+                "G or GR: Granular",
+                "P: Pastille",
+                "S: Solution",
+                "SC: Sprayable Concentrate",
+                "SP: Soluble powder",
+                "ULC: Ultra Low Volume Concentrate",
+                "WDG: Water-dispersible granules",
+                "W or WP: Wettable powder",
+                "WS: Water-soluble concentrate"
+            ],
+            "placeholder" => "Select formulation type"
+        ],
+        [
+            "key" => "registration_number",
+            "label" => "Registration Number*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter registration number"
+        ],
+        [
+            "key" => "function",
+            "label" => "Function",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => [
+                "- Non-selective systemic herbicide",
+                "- Rice herbicide",
+                "- Cotton herbicide",
+                "- Post-emergence maize herbicide",
+                "- Rice insecticide",
+                "- Larval biopesticide",
+                "Other"
+            ],
+            "placeholder" => "Select function"
+        ],
+        [
+            "key" => "other_function",
+            "label" => "Other function",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Specify other function if any"
+        ],
+        [
+            "key" => "toxicological_class_number",
+            "label" => "Toxicological class and number",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter toxicological class and number"
+        ],
+        [
+            "key" => "approval_number",
+            "label" => "Approval number*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter approval number"
+        ],
+        [
+            "key" => "wholesale_price",
+            "label" => "Average wholesale prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter wholesale price"
+        ],
+        [
+            "key" => "semi_wholesale_price",
+            "label" => "Average semi-wholesalers price by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter semi-wholesale price"
+        ],
+        [
+            "key" => "retail_price",
+            "label" => "Average retail prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter retail price"
+        ],
+        [
+            "key" => "language_id",
+            "label" => "Language ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => true,
+            "placeholder" => "Language ID hidden field"
+        ],
+        [
+            "key" => "seed_id",
+            "label" => "Seed ID",
+            "value" => $seed_id,
+            "inputType" => "hidden",
+            "required" => true,
+            "placeholder" => "Seed ID hidden field"
+        ],
+        [
+            "key" => "created_by",
+            "label" => "Created By",
+            "value" => 1,
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Created by hidden field"
+        ]
+    ];
+}
+private function inorganicSoilConditionersForm($seed_id)
+{
+    return [
+        [
+            "key" => "conditioner_type",
+            "label" => "Conditioner type*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Example: Lime, Gypsum"
+        ],
+        [
+            "key" => "physical_form",
+            "label" => "Physical form*",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => true,
+            "options" => ["Liquid", "Solid", "Powder"],
+            "placeholder" => "Select physical form"
+        ],
+        [
+            "key" => "trade_name",
+            "label" => "Trade name*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter trade name"
+        ],
+        [
+            "key" => "raw_material",
+            "label" => "Raw material",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => false,
+            "options" => ["Limestone", "Slate", "Gypsum", "Glauconite", "Other"],
+            "placeholder" => "Select raw material"
+        ],
+        [
+            "key" => "other_raw_material",
+            "label" => "Other (if raw material is 'Other')",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Specify other raw material"
+        ],
+        [
+            "key" => "function",
+            "label" => "Function",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Enter function (e.g., improves soil structure)"
+        ],
+        [
+            "key" => "wholesale_price",
+            "label" => "Average wholesale prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter wholesale price"
+        ],
+        [
+            "key" => "semi_wholesale_price",
+            "label" => "Average semi-wholesalers price by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter semi-wholesale price"
+        ],
+        [
+            "key" => "retail_price",
+            "label" => "Average retail prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter retail price"
+        ],
+        [
+            "key" => "language_id",
+            "label" => "Language ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Language ID hidden field"
+        ],
+        [
+            "key" => "seed_id",
+            "label" => "Seed ID",
+            "value" => $seed_id,
+            "inputType" => "hidden",
+            "required" => true,
+            "placeholder" => "Seed ID hidden field"
+        ],
+        [
+            "key" => "supplier_id",
+            "label" => "Supplier ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Supplier ID hidden field"
+        ],
+        [
+            "key" => "agent_id",
+            "label" => "Agent ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Agent ID hidden field"
+        ],
+        [
+            "key" => "created_by",
+            "label" => "Created By",
+            "value" => 1,
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Created by hidden field"
+        ]
+    ];
+}
+private function biostimulantsForm($seed_id)
+{
+    return [
+        [
+            "key" => "trade_name",
+            "label" => "Trade name*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter trade name"
+        ],
+        [
+            "key" => "physical_form",
+            "label" => "Physical form*",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => true,
+            "options" => ["Liquid", "Solid granules", "Powder"],
+            "placeholder" => "Select physical form"
+        ],
+        [
+            "key" => "biostimulant_product_name",
+            "label" => "Biostimulant product name*",
+            "value" => "",
+            "inputType" => "radio",
+            "required" => true,
+            "options" => ["Bacteria", "Mushrooms", "Yeast", "Purified plant extracts", "Vitamins", "Rock powder"],
+            "placeholder" => "Select biostimulant product name"
+        ],
+        [
+            "key" => "re_registration_number",
+            "label" => "ReRegistration Number*",
+            "value" => "",
+            "inputType" => "text",
+            "required" => true,
+            "placeholder" => "Enter re-registration number"
+        ],
+        [
+            "key" => "n_percent",
+            "label" => "% N",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter percentage of Nitrogen (N)"
+        ],
+        [
+            "key" => "p2o5_percent",
+            "label" => "% P₂O₅",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter percentage of P₂O₅"
+        ],
+        [
+            "key" => "k2o_percent",
+            "label" => "% K₂O",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter percentage of K₂O"
+        ],
+        [
+            "key" => "zn_percent",
+            "label" => "% Zn",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter percentage of Zinc (Zn)"
+        ],
+        [
+            "key" => "ca_percent",
+            "label" => "% Ca",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter percentage of Calcium (Ca)"
+        ],
+        [
+            "key" => "mg_percent",
+            "label" => "% Mg",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter percentage of Magnesium (Mg)"
+        ],
+        [
+            "key" => "s_percent",
+            "label" => "% S",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter percentage of Sulphur (S)"
+        ],
+        [
+            "key" => "b_percent",
+            "label" => "% B",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter percentage of Boron (B)"
+        ],
+        [
+            "key" => "mo_percent",
+            "label" => "% Mo",
+            "value" => "",
+            "inputType" => "number",
+            "required" => false,
+            "placeholder" => "Enter percentage of Molybdenum (Mo)"
+        ],
+        [
+            "key" => "mode_of_action",
+            "label" => "Mode of action",
+            "value" => "",
+            "inputType" => "text",
+            "required" => false,
+            "placeholder" => "Describe mode of action"
+        ],
+        [
+            "key" => "wholesale_price",
+            "label" => "Average wholesale prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter wholesale price"
+        ],
+        [
+            "key" => "semi_wholesale_price",
+            "label" => "Average semi-wholesalers price by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter semi-wholesale price"
+        ],
+        [
+            "key" => "retail_price",
+            "label" => "Average retail prices by packaging type*",
+            "value" => "",
+            "inputType" => "number",
+            "required" => true,
+            "placeholder" => "Enter retail price"
+        ],
+        [
+            "key" => "language_id",
+            "label" => "Language ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Language ID hidden field"
+        ],
+        [
+            "key" => "seed_id",
+            "label" => "Seed ID",
+            "value" => $seed_id,
+            "inputType" => "hidden",
+            "required" => true,
+            "placeholder" => "Seed ID hidden field"
+        ],
+        [
+            "key" => "supplier_id",
+            "label" => "Supplier ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Supplier ID hidden field"
+        ],
+        [
+            "key" => "agent_id",
+            "label" => "Agent ID",
+            "value" => "",
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Agent ID hidden field"
+        ],
+        [
+            "key" => "created_by",
+            "label" => "Created By",
+            "value" => 1,
+            "inputType" => "hidden",
+            "required" => false,
+            "placeholder" => "Created by hidden field"
+        ]
+    ];
+}
+}

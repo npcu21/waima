@@ -1,0 +1,4 @@
+
+"===== synthetic_pesticides ====="
+id,form_type,trade_name,active_ingredient,other_active_ingredient,formulation,registration_number,function,other_function,toxicological_class_number,approval_number,wholesale_price,semiwholesale_price,retail_price,qr_code_path,product_id,supplier_id,agent_id,language_id,created_by,created_at,updated_at,qr_code_url
+27,synthetic_pesticide,trhd8,"Acetamiprid 32 g/day",,"SC: Sprayable Concentrate",dhdh,"Cotton herbicide",,,7,88.00,67.00,67.00,qrcodes/pesticide_27.png,3,103,48,1,1,"2025-11-13 02:13:06","2025-11-13 02:13:06",https://fivoflow.com/wclm/public/qrcodes/pesticide_27.png

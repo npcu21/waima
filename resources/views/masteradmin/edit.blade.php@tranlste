@@ -1,0 +1,71 @@
+@extends('admin.layouts.app')
+
+@section('title', 'Edit Master Admin')
+
+@section('content')
+
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+<div class="container-fluid p-0">
+
+    <!-- Navbar -->
+  
+ <!-- Navbar -->
+    @include('includes.navbar')
+
+
+    <!-- Page Content -->
+    <div class="container p-4">
+        <h4 class="mb-4 text-center"> Administrator Edit </h4>
+
+        <div class="card p-4 shadow col-md-6 mx-auto">
+
+            <form action="{{ route('masteradmin.update', $admin->id) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="mb-3">
+                    <label>Name</label>
+                    <input type="text" name="name" value="{{ old('name', $admin->name) }}" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input type="email" name="email" value="{{ old('email', $admin->email) }}" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Phone</label>
+                    <input type="text" name="phone" value="{{ old('phone', $admin->phone) }}" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Password (Leave blank if you do not want to change)</label>
+                    <input type="password" name="password" class="form-control" placeholder="Enter new password">
+                </div>
+
+                <div class="mb-3">
+                    <label>Country</label>
+                    <select name="country_id" class="form-control">
+                        <option value="">Select Country</option>
+                        @foreach($countries as $country)
+                            <option value="{{ $country->id }}" 
+                                {{ $admin->country_id == $country->id ? 'selected' : '' }}>
+                                {{ $country->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="text-center mt-3">
+                    <button type="submit" class="btn btn-primary d-block w-100 py-2">Update</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@endsection

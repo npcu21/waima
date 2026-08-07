@@ -1,0 +1,95 @@
+<?php
+return [
+
+    'all_countries' => 'All Countries',
+    'filter' => 'Filter',
+    'supplier_list' => 'Supplier List',
+    'add_supplier' => 'Add Supplier',
+'deny' => 'Deny',
+    'id' => 'ID',
+    'company_name' => 'Company Name',
+    'manager' => 'Manager',
+    'email' => 'Email',
+    'phone' => 'Phone',
+    'image' => 'Image',
+    'status' => 'Status',
+    'action' => 'Action',
+
+    'no_image' => 'No Image',
+    'pending' => 'Pending',
+    'approved' => 'Approved',
+    'denied' => 'Denied',
+
+    'approve' => 'Approve',
+    'edit' => 'Edit',
+    'delete' => 'Delete',
+    'view_details' => 'View Details',
+    'confirm_delete' => 'Are you sure you want to delete this supplier?',
+'reject_reason_prompt' => 'Enter reject reason:',
+// Example English
+'edit_supplier' => 'Edit Supplier',
+'supplier_information' => 'Supplier Information',
+'company_name' => 'Company Name',
+'manager' => 'Manager Name',
+'position' => 'Position',
+'profile_image' => 'Profile Image',
+'status' => 'Status',
+'location' => 'Location',
+'city' => 'City',
+'region' => 'Region',
+'country' => 'Country',
+'select_country' => '-- Select Country --',
+'address' => 'Address',
+'phone' => 'Phone',
+'mobile' => 'Mobile',
+'email' => 'Email',
+'employer_identification_number' => 'Employer Identification Number',
+'state_entity_registration' => 'State Entity Registration',
+'latitude' => 'Latitude',
+'longitude' => 'Longitude',
+'update_supplier' => 'Update Supplier',
+'back' => 'Back',
+'no_image' => 'No Image',
+ 'details' => 'Supplier Details',
+    'id' => 'ID',
+    'country' => 'Country',
+    'company_name' => 'Company Name',
+    'manager_name' => 'Manager Name',
+    'name' => 'Name',
+    'position' => 'Position',
+
+    'image' => 'Image',
+    'no_image' => 'No Image',
+
+    'city' => 'City',
+    'region' => 'Region',
+    'address' => 'Address',
+    'phone' => 'Phone',
+    'mobile' => 'Mobile',
+    'email' => 'Email',
+
+    'state_entity_registration' => 'State Entity Registration',
+    'employer_identification_number' => 'Employer Identification Number',
+
+    'status' => 'Status',
+    'status_pending' => 'Pending',
+    'status_approved' => 'Approved',
+    'status_denied' => 'Denied',
+
+    'created_at' => 'Created At',
+
+    'enumerator_last_name' => 'Enumerator Last Name',
+    'enumerator_first_name' => 'Enumerator First Name',
+    'enumerator_whatsapp' => 'Enumerator WhatsApp',
+
+    'latitude' => 'Latitude',
+    'longitude' => 'Longitude',
+    'altitude' => 'Altitude',
+    'accuracy' => 'Accuracy',
+
+    'back_to_list' => 'Back to List',
+
+
+      'supplier_created' => 'Supplier created successfully',
+
+];

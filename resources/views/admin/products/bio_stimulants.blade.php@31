@@ -1,0 +1,47 @@
+<div class="form4 form-section form-container">
+    <h5>Bio-Stimulants</h5>
+    <form action="{{ route('bio_stimulants.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <input type="hidden" name="form_type" value="bio_stimulants">
+        <input type="hidden" name="product_id" id="hidden_product_id" value="5">
+        <input type="hidden" name="supplier_id" id="supplier_id" value="{{ old('supplier_id') }}">
+        <input type="hidden" name="agent_id" id="agent_id" value="{{ old('agent_id') }}">
+        <input type="hidden" name="created_by" id="created_by" value="{{ session('admin_id') }}">
+
+        <div class="row gy-3">
+            @foreach($fields as $f)
+                @if($f->type == 'text')
+                    <div class="col-md-6">
+                        <label class="form-label">{{ $f->label }}@if($f->required)*@endif</label>
+                        <input type="text" name="{{ $f->name }}" class="form-control" @if($f->required)required @endif>
+                    </div>
+                @elseif($f->type == 'number')
+                    <div class="col-md-6">
+                        <label class="form-label">{{ $f->label }}</label>
+                        <input type="number" step="0.01" name="{{ $f->name }}" class="form-control" @if($f->required)required @endif>
+                    </div>
+                @elseif($f->type == 'select')
+                    <div class="col-md-6">
+                        <label class="form-label d-block">{{ $f->label }}@if($f->required)*@endif</label>
+                        @foreach(json_decode($f->options) as $option)
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="{{ $f->name }}" value="{{ $option }}" @if($f->required)required @endif>
+                                <label class="form-check-label">{{ $option }}</label>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            @endforeach
+
+            <!-- ✅ Image Upload Field -->
+            <div class="col-md-6">
+                <label class="form-label">Upload Image</label>
+                <input type="file" name="otherRecommendationsPhoto" class="form-control" accept="image/*">
+            </div>
+
+            <div class="col-12 mt-3">
+                <button type="submit" class="btn btn-primary">Save Bio-Stimulant</button>
+            </div>
+        </div>
+    </form>
+</div>

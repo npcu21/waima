@@ -1,0 +1,78 @@
+<form action="{{ route('animalfeed.store') }}" method="POST" enctype="multipart/form-data">
+    @csrf
+
+    <h5>Animal Feed</h5>
+
+    <input type="hidden" name="form_type" value="animal_feed">
+    <input type="hidden" name="product_id" id="product_id" value="">
+    <input type="hidden" name="created_by" value="{{ session('user_id') }}">
+    <input type="hidden" name="supplier_id" id="supplier_id" value="">
+    <input type="hidden" name="agent_id" id="agent_id" value="">
+
+    <div class="row gy-3">
+
+        @foreach($fields as $field)
+        <div class="col-md-6">
+            <label class="form-label">{{ $field->label }}</label>
+
+            @if($field->type == 'select')
+                @php $opts = json_decode($field->options); @endphp
+                <select class="form-select" name="{{ $field->name }}" @if($field->required) required @endif>
+                    <option value="">Select {{ $field->label }}</option>
+                    @foreach($opts as $opt)
+                        <option value="{{ $opt }}">{{ $opt }}</option>
+                    @endforeach
+                </select>
+            @else
+                <input 
+                    type="{{ $field->type }}" 
+                    class="form-control" 
+                    name="{{ $field->name }}"
+                    @if($field->required) required @endif
+                >
+            @endif
+        </div>
+        @endforeach
+
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Save Animal Feed</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // ⬇️ Product ID Set
+    const mainProduct = document.getElementById('hidden_product_id'); 
+    const productInput = document.getElementById('product_id');
+    
+    if(mainProduct && productInput){
+        productInput.value = mainProduct.value;
+        mainProduct.addEventListener('change', function(){
+            productInput.value = this.value;
+        });
+    }
+
+    // ⬇️ Supplier & Agent ID Set
+    const mainSupplier = document.getElementById('supplier_select');
+    const mainAgent = document.getElementById('agent_select');
+
+    const supplierInput = document.getElementById('supplier_id');
+    const agentInput = document.getElementById('agent_id');
+
+    function updateHiddenFields(){
+        if(mainSupplier) supplierInput.value = mainSupplier.value;
+        if(mainAgent) agentInput.value = mainAgent.value;
+    }
+
+    updateHiddenFields();
+
+    if(mainSupplier){
+        mainSupplier.addEventListener('change', updateHiddenFields);
+    }
+
+    if(mainAgent){
+        mainAgent.addEventListener('change', updateHiddenFields);
+    }
+});
+</script>

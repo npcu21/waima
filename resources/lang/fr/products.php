@@ -1,0 +1,20 @@
+<?php
+return [
+    'id' => 'ID',
+    'title' => 'Titre',
+    'Typeoffeed' => 'Matières premières (intrants utilisés dans la production d’aliments pour animaux)',
+    'afrm' => 'Matières premières (intrants utilisés dans la production d’aliments pour animaux)',
+    'afPhysicalform' => 'Forme physique (granulés, farine, miettes)',
+    'afdm' => '% Matière sèche (MS)',
+    'afEnergy' => '% Énergie (UF, kcal)',
+    'afcp' => '% Protéine brute',
+    'afsp' => 'Durée de conservation',
+    'affs' => 'Suppléments alimentaires',
+    'afWholesalePrice' => 'Prix de gros moyens par type d’emballage',
+    'afsemiwholesalePrice' => 'Prix semi-gros moyens par type d’emballage',
+    'afretailPrice' => 'Prix de détail moyens par type d’emballage',
+    'qr_code_path' => 'Code QR',
+    'status_id' => 'Statut',
+    'supplier' => 'Fournisseur',
+    'action' => 'Action',
+];

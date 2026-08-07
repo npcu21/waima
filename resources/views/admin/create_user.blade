@@ -1,0 +1,86 @@
+@extends('admin.layouts.app')
+
+@section('title', 'Create Farmer')
+
+@section('content')
+
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
+@include('includes.navbar')
+
+<div class="container create-user-container">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-10">
+            <div class="card shadow-sm rounded-4 p-4 mb-5">
+                <h2 class="text-center mb-4">Create Farmer</h2>
+
+                @if(session('success'))
+                    <div class="alert alert-success">{{ session('success') }}</div>
+                @endif
+
+                <form action="{{ route('admin.store_user') }}" method="POST">
+                    @csrf
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" id="username"
+                            placeholder="Enter username" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" name="name" class="form-control" id="name"
+                            placeholder="Enter name" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" id="email"
+                            placeholder="Enter email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="usertype_id" class="form-label">User Type</label>
+                        <select name="usertype_id" class="form-select" id="usertype_id" required>
+                            <option value="">Select User Type</option>
+                            @foreach($usertypes as $type)
+                                @if($type->id == 3)
+                                    <option value="{{ $type->id }}">{{ $type->type_name }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="country_id" class="form-label">Country</label>
+                        <select name="country_id" class="form-select" id="country_id" required>
+                            <option value="">Select Country</option>
+                            @foreach($countries as $country)
+                                <option value="{{ $country->id }}">{{ $country->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone</label>
+                        <input type="text" name="phone" class="form-control" id="phone"
+                            placeholder="Enter phone number" required>
+                    </div>
+
+                    <div class="d-grid mt-3">
+                        <button type="submit" class="btn btn-primary rounded-pill py-2">Create User</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.create-user-container { padding-top: 60px; padding-bottom: 60px; }
+@media (max-width: 768px) { .create-user-container { padding-top: 110px; } }
+body { background-color: #f8f9fa; }
+.navbar-brand { font-size: 1.3rem; }
+</style>
+
+@endsection

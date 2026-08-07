@@ -1,0 +1,3 @@
+id,form_type,product_id,organic_type,physical_form,trade_name,country_origin,bio_label,n,p2,k2,cao,mgo,cn_ratio,raw_material,raw_material_other,arsenic_content,wholesale_price,semiwholesale_price,retail_price,qr_code_path,supplier_id,agent_id,created_by,language_id,created_at,updated_at,qr_code_url
+63,organic_amendment,6,Manure,Solid,maste,pk,sbc,1,1,1,1,1,1,"[""Cow Dung""]",1,1,11.00,1.00,1.00,,72,,1,,"2025-11-05 12:06:47","2025-11-05 12:06:47",
+64,organic_amendment,6,govdqqqqan,Granular,EcoSoil,India,"Certified Organic",3,1,2,1,0,20:1,"[""Cow dung"",""Worm castings""]","Neem leaves",None,100.00,120.00,150.00,qrcodes/organic_64.png,37,3,1,1,"2025-11-07 05:47:10","2025-11-07 05:47:40",https://fivoflow.com/wclm/public/qrcodes/organic_64.png

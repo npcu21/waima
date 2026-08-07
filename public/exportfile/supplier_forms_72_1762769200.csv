@@ -1,0 +1,32 @@
+
+"===== seeds ====="
+id,form_type,title,product_id,language_id,qr_code_path,cropName,verityName,breederName,countryOrigin,registrationNumber,varietyType,seedCategory,precocity,fruitColor,fruitShape,leafLength,leafColor,plantHeight,plantHabit,bioticResistance,abioticResistance,InherentNutritionalValue,other,yield,otherRecommendations,otherRecommendationsPhoto,wholesalePrice,semiwholesalePrice,retailPrice,supplier_id,agent_id,created_by,created_at,updated_at,qr_code_url
+84,seed_form,seed,8,1,,seed,oil,rosted,inida,up,Hybrid,1,red,l,res,10,10,10,rhizomatous,12,12,"Rich in Beta-carotene",1,1,1,seed_photos/mKAUXJ9bm2zGtIrPIhWP3K3L99aZNuEAw1LuvGb0.png,1.00,11.00,1.00,72,,1,"2025-11-05 12:03:18","2025-11-05 12:03:18",
+
+"===== veterinary_products ====="
+id,form_type,title,product_name,manufacturing_lab,active_substance,registration_number,therapeutic_class,other_therapeutic_class,dosage,pharmaceutical_form,route_of_administration,targeted_animals,waiting_period,expiry_date,transport_storage_requirements,wholesale_price,semiwholesale_price,retail_price,qr_code_path,product_id,created_by,supplier_id,agent_id,language_id,created_at,updated_at,qr_code_url
+44,veterinary_product,,ter,jknsjc,nca,j,Antibiotics,j,1,1,1,1,1,2025-11-05,2,2.00,2.00,2.00,,1,1,72,,1,"2025-11-05 12:04:18","2025-11-06 05:46:55",
+
+"===== organic_amendments ====="
+id,form_type,product_id,organic_type,physical_form,trade_name,country_origin,bio_label,n,p2,k2,cao,mgo,cn_ratio,raw_material,raw_material_other,arsenic_content,wholesale_price,semiwholesale_price,retail_price,qr_code_path,supplier_id,agent_id,created_by,language_id,created_at,updated_at,qr_code_url
+63,organic_amendment,6,Manure,Solid,maste,pk,sbc,1,1,1,1,1,1,"[""Cow Dung""]",1,1,11.00,1.00,1.00,,72,,1,,"2025-11-05 12:06:47","2025-11-05 12:06:47",
+
+"===== inorganic_soil_conditioners ====="
+id,conditioner_type,form_type,product_id,physical_form,trade_name,raw_material,other,function,wholesale_price,semiwholesale_price,retail_price,qr_code_path,created_by,supplier_id,agent_id,created_at,updated_at,qr_code_url
+27,2,inorganic_soil_conditioner,4,Liquid,12,Limestone,2,2,2.00,2.00,2.00,,1,72,,"2025-11-05 12:07:35","2025-11-05 12:07:35",
+38,"Phosphate Fertilizer",inorganic_soil_conditioner,4,Granular,PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_38.png,1,72,,"2025-11-07 06:07:17","2025-11-07 06:07:24",https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+39,"Phosphate Fertilizer",inorganic_soil_conditioner,4,test,PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_39.png,1,72,,"2025-11-07 06:07:56","2025-11-07 06:07:57",https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+40,"Phosphate Fertilizer",inorganic_soil_conditioner,4,test,PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_40.png,1,72,,"2025-11-07 08:50:27","2025-11-07 08:50:29",https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+41,"Phosphate Fertilizer",inorganic_soil_conditioner,4,4,PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_41.png,1,72,,"2025-11-07 08:51:21","2025-11-07 08:51:23",https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+42,"Pho244sphate Fertilizer",inorganic_soil_conditioner,4,4,PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_42.png,1,72,,"2025-11-07 09:02:38","2025-11-07 09:02:40",https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+43,"Pho244sphate Fertilizer",inorganic_soil_conditioner,4,44,PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_43.png,1,72,,"2025-11-07 09:14:28","2025-11-07 09:14:29",https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+44,ki,inorganic_soil_conditioner,4,"update data",PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_44.png,1,72,,"2025-11-07 09:18:43","2025-11-07 10:06:04",https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+45,"Pho244sphate Fertilizer",inorganic_soil_conditioner,4,"update data",PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_45.png,1,72,,"2025-11-07 09:19:18","2025-11-07 09:19:20",https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+47,lijme,inorganic_soil_conditioner,4,"update data",PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_47.png,1,72,,"2025-11-07 09:34:49","2025-11-07 09:34:52",https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+48,lijme,inorganic_soil_conditioner,4,"update data",PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_48.png,1,72,,"2025-11-07 09:39:25","2025-11-07 09:39:27",https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+51,lijnsdcsacme,inorganic_soil_conditioner,4,"update data",PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_51.png,1,72,,"2025-11-07 10:00:42","2025-11-07 10:00:46",https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+52,ki0,inorganic_soil_conditioner,4,"update data",PhosGrow,"Phosphoric Acid","Contains micronutrients","Improves soil phosphorus content",200.50,220.75,250.00,qrcodes/inorganic_52.png,1,72,,"2025-11-07 10:06:31","2025-11-07 10:07:03",https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+
+"===== biostimulants ====="
+id,form_type,product_id,trade_name,physical_form,biostimulant_product,re_registration,n,p2,k2,zn,ca,mg,s,b,mo,action_mode,wholesale_price,semiwholesale_price,retail_price,qr_code_path,supplier_id,agent_id,created_by,language_id,created_at,updated_at,qr_code_url
+42,bio_stimulant,5,nvdn,Liquid,"Purified plant extracts",85,1,1,1,1,1,1,1,1,1,1,1.00,1.00,1.00,,72,,1,1,"2025-11-05 12:07:13","2025-11-05 12:07:13",

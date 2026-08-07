@@ -1,0 +1,385 @@
+"Table Name",Field,Value,"QR Code URL"
+seeds,id,84,
+seeds,form_type,seed_form,
+seeds,title,seed,
+seeds,product_id,8,
+seeds,language_id,1,
+seeds,qr_code_path,,
+seeds,cropName,seed,
+seeds,verityName,oil,
+seeds,breederName,rosted,
+seeds,countryOrigin,inida,
+seeds,registrationNumber,up,
+seeds,varietyType,Hybrid,
+seeds,seedCategory,1,
+seeds,precocity,red,
+seeds,fruitColor,l,
+seeds,fruitShape,res,
+seeds,leafLength,10,
+seeds,leafColor,10,
+seeds,plantHeight,10,
+seeds,plantHabit,rhizomatous,
+seeds,bioticResistance,12,
+seeds,abioticResistance,12,
+seeds,InherentNutritionalValue,"Rich in Beta-carotene",
+seeds,other,1,
+seeds,yield,1,
+seeds,otherRecommendations,1,
+seeds,otherRecommendationsPhoto,seed_photos/mKAUXJ9bm2zGtIrPIhWP3K3L99aZNuEAw1LuvGb0.png,
+seeds,wholesalePrice,1.00,
+seeds,semiwholesalePrice,11.00,
+seeds,retailPrice,1.00,
+seeds,supplier_id,72,
+seeds,agent_id,,
+seeds,created_by,1,
+seeds,created_at,2025-11-05T12:03:18.000000Z,
+seeds,updated_at,2025-11-05T12:03:18.000000Z,
+seeds,qr_code_url,,
+
+veterinary_products,id,44,
+veterinary_products,form_type,veterinary_product,
+veterinary_products,title,,
+veterinary_products,product_name,ter,
+veterinary_products,manufacturing_lab,jknsjc,
+veterinary_products,active_substance,nca,
+veterinary_products,registration_number,j,
+veterinary_products,therapeutic_class,Antibiotics,
+veterinary_products,other_therapeutic_class,j,
+veterinary_products,dosage,1,
+veterinary_products,pharmaceutical_form,1,
+veterinary_products,route_of_administration,1,
+veterinary_products,targeted_animals,1,
+veterinary_products,waiting_period,1,
+veterinary_products,expiry_date,2025-11-05,
+veterinary_products,transport_storage_requirements,2,
+veterinary_products,wholesale_price,2.00,
+veterinary_products,semiwholesale_price,2.00,
+veterinary_products,retail_price,2.00,
+veterinary_products,qr_code_path,,
+veterinary_products,product_id,1,
+veterinary_products,created_by,1,
+veterinary_products,supplier_id,72,
+veterinary_products,agent_id,,
+veterinary_products,language_id,1,
+veterinary_products,created_at,2025-11-05T12:04:18.000000Z,
+veterinary_products,updated_at,2025-11-06T05:46:55.000000Z,
+veterinary_products,qr_code_url,,
+
+organic_amendments,id,63,
+organic_amendments,form_type,organic_amendment,
+organic_amendments,product_id,6,
+organic_amendments,organic_type,Manure,
+organic_amendments,physical_form,Solid,
+organic_amendments,trade_name,maste,
+organic_amendments,country_origin,pk,
+organic_amendments,bio_label,sbc,
+organic_amendments,n,1,
+organic_amendments,p2,1,
+organic_amendments,k2,1,
+organic_amendments,cao,1,
+organic_amendments,mgo,1,
+organic_amendments,cn_ratio,1,
+organic_amendments,raw_material,"[""Cow Dung""]",
+organic_amendments,raw_material_other,1,
+organic_amendments,arsenic_content,1,
+organic_amendments,wholesale_price,11.00,
+organic_amendments,semiwholesale_price,1.00,
+organic_amendments,retail_price,1.00,
+organic_amendments,qr_code_path,,
+organic_amendments,supplier_id,72,
+organic_amendments,agent_id,,
+organic_amendments,created_by,1,
+organic_amendments,language_id,,
+organic_amendments,created_at,2025-11-05T12:06:47.000000Z,
+organic_amendments,updated_at,2025-11-05T12:06:47.000000Z,
+organic_amendments,qr_code_url,,
+
+inorganic_soil_conditioners,id,27,
+inorganic_soil_conditioners,conditioner_type,2,
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,
+inorganic_soil_conditioners,product_id,4,
+inorganic_soil_conditioners,physical_form,Liquid,
+inorganic_soil_conditioners,trade_name,12,
+inorganic_soil_conditioners,raw_material,Limestone,
+inorganic_soil_conditioners,other,2,
+inorganic_soil_conditioners,function,2,
+inorganic_soil_conditioners,wholesale_price,2.00,
+inorganic_soil_conditioners,semiwholesale_price,2.00,
+inorganic_soil_conditioners,retail_price,2.00,
+inorganic_soil_conditioners,qr_code_path,,
+inorganic_soil_conditioners,created_by,1,
+inorganic_soil_conditioners,supplier_id,72,
+inorganic_soil_conditioners,agent_id,,
+inorganic_soil_conditioners,created_at,2025-11-05T12:07:35.000000Z,
+inorganic_soil_conditioners,updated_at,2025-11-05T12:07:35.000000Z,
+inorganic_soil_conditioners,qr_code_url,,
+
+inorganic_soil_conditioners,id,38,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,conditioner_type,"Phosphate Fertilizer",https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,physical_form,Granular,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_38.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,created_at,2025-11-07T06:07:17.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,updated_at,2025-11-07T06:07:24.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_38.png
+
+inorganic_soil_conditioners,id,39,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,conditioner_type,"Phosphate Fertilizer",https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,physical_form,test,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_39.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,created_at,2025-11-07T06:07:56.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,updated_at,2025-11-07T06:07:57.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_39.png
+
+inorganic_soil_conditioners,id,40,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,conditioner_type,"Phosphate Fertilizer",https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,physical_form,test,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_40.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,created_at,2025-11-07T08:50:27.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,updated_at,2025-11-07T08:50:29.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_40.png
+
+inorganic_soil_conditioners,id,41,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,conditioner_type,"Phosphate Fertilizer",https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,physical_form,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_41.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,created_at,2025-11-07T08:51:21.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,updated_at,2025-11-07T08:51:23.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_41.png
+
+inorganic_soil_conditioners,id,42,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,conditioner_type,"Pho244sphate Fertilizer",https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,physical_form,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_42.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,created_at,2025-11-07T09:02:38.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,updated_at,2025-11-07T09:02:40.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_42.png
+
+inorganic_soil_conditioners,id,43,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,conditioner_type,"Pho244sphate Fertilizer",https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,physical_form,44,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_43.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,created_at,2025-11-07T09:14:28.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,updated_at,2025-11-07T09:14:29.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_43.png
+
+inorganic_soil_conditioners,id,44,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,conditioner_type,ki,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,physical_form,"update data",https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_44.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,created_at,2025-11-07T09:18:43.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,updated_at,2025-11-07T10:06:04.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_44.png
+
+inorganic_soil_conditioners,id,45,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,conditioner_type,"Pho244sphate Fertilizer",https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,physical_form,"update data",https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_45.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,created_at,2025-11-07T09:19:18.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,updated_at,2025-11-07T09:19:20.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_45.png
+
+inorganic_soil_conditioners,id,47,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,conditioner_type,lijme,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,physical_form,"update data",https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_47.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,created_at,2025-11-07T09:34:49.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,updated_at,2025-11-07T09:34:52.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_47.png
+
+inorganic_soil_conditioners,id,48,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,conditioner_type,lijme,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,physical_form,"update data",https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_48.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,created_at,2025-11-07T09:39:25.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,updated_at,2025-11-07T09:39:27.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_48.png
+
+inorganic_soil_conditioners,id,51,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,conditioner_type,lijnsdcsacme,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,physical_form,"update data",https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_51.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,created_at,2025-11-07T10:00:42.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,updated_at,2025-11-07T10:00:46.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_51.png
+
+inorganic_soil_conditioners,id,52,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,conditioner_type,ki0,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,form_type,inorganic_soil_conditioner,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,product_id,4,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,physical_form,"update data",https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,trade_name,PhosGrow,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,raw_material,"Phosphoric Acid",https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,other,"Contains micronutrients",https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,function,"Improves soil phosphorus content",https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,wholesale_price,200.50,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,semiwholesale_price,220.75,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,retail_price,250.00,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,qr_code_path,qrcodes/inorganic_52.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,created_by,1,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,supplier_id,72,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,agent_id,,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,created_at,2025-11-07T10:06:31.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,updated_at,2025-11-07T10:07:03.000000Z,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+inorganic_soil_conditioners,qr_code_url,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png,https://fivoflow.com/wclm/public/qrcodes/inorganic_52.png
+
+biostimulants,id,42,
+biostimulants,form_type,bio_stimulant,
+biostimulants,product_id,5,
+biostimulants,trade_name,nvdn,
+biostimulants,physical_form,Liquid,
+biostimulants,biostimulant_product,"Purified plant extracts",
+biostimulants,re_registration,85,
+biostimulants,n,1,
+biostimulants,p2,1,
+biostimulants,k2,1,
+biostimulants,zn,1,
+biostimulants,ca,1,
+biostimulants,mg,1,
+biostimulants,s,1,
+biostimulants,b,1,
+biostimulants,mo,1,
+biostimulants,action_mode,1,
+biostimulants,wholesale_price,1.00,
+biostimulants,semiwholesale_price,1.00,
+biostimulants,retail_price,1.00,
+biostimulants,qr_code_path,,
+biostimulants,supplier_id,72,
+biostimulants,agent_id,,
+biostimulants,created_by,1,
+biostimulants,language_id,1,
+biostimulants,created_at,2025-11-05T12:07:13.000000Z,
+biostimulants,updated_at,2025-11-05T12:07:13.000000Z,
+biostimulants,qr_code_url,,
+

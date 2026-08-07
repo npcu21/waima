@@ -1,0 +1,93 @@
+<?php
+return [
+
+    'all_countries' => 'Tous les pays',
+    'filter' => 'Filtrer',
+    'supplier_list' => 'Liste des fournisseurs',
+    'add_supplier' => 'Ajouter un fournisseur',
+'deny' => 'Refusé',
+
+    'id' => 'ID',
+    'company_name' => 'Nom de l’entreprise',
+    'manager' => 'Gestionnaire',
+    'email' => 'E-mail',
+    'phone' => 'Téléphone',
+    'image' => 'Image',
+    'status' => 'Statut',
+    'action' => 'Action',
+
+    'no_image' => 'Aucune image',
+    'pending' => 'En attente',
+    'approved' => 'Approuvé',
+    'denied' => 'Refusé',
+
+    'approve' => 'Approuver',
+    'edit' => 'Modifier',
+    'delete' => 'Supprimer',
+    'view_details' => 'Voir les détails',
+    'confirm_delete' => 'Êtes-vous sûr de vouloir supprimer ce fournisseur ?',
+'reject_reason_prompt' => 'Entrez la raison du refus :',
+
+'edit_supplier' => 'Modifier le fournisseur',
+'supplier_information' => 'Informations sur le fournisseur',
+'company_name' => 'Nom de l\'entreprise',
+'manager' => 'Nom du responsable',
+'position' => 'Poste',
+'profile_image' => 'Image de profil',
+'status' => 'Statut',
+'location' => 'Emplacement',
+'city' => 'Ville',
+'region' => 'Région',
+'country' => 'Pays',
+'select_country' => '-- Sélectionnez un pays --',
+'address' => 'Adresse',
+'phone' => 'Téléphone',
+'mobile' => 'Mobile',
+'email' => 'E-mail',
+'employer_identification_number' => 'Numéro d\'identification de l\'employeur',
+'state_entity_registration' => 'Enregistrement de l\'entité de l\'État',
+'latitude' => 'Latitude',
+'longitude' => 'Longitude',
+'update_supplier' => 'Mettre à jour le fournisseur',
+'back' => 'Retour',
+'no_image' => 'Pas d\'image',
+  'details' => 'Détails du Fournisseur',
+    'id' => 'ID',
+    'country' => 'Pays',
+    'company_name' => 'Nom de l\'entreprise',
+    'manager_name' => 'Nom du Manager',
+    'name' => 'Nom',
+    'position' => 'Poste',
+
+    'image' => 'Image',
+    'no_image' => 'Aucune image',
+
+    'city' => 'Ville',
+    'region' => 'Région',
+    'address' => 'Adresse',
+    'phone' => 'Téléphone',
+    'mobile' => 'Mobile',
+    'email' => 'Email',
+
+    'state_entity_registration' => 'Enregistrement de l\'entité d\'État',
+    'employer_identification_number' => 'Numéro d’identification de l’employeur',
+
+    'status' => 'Statut',
+    'status_pending' => 'En attente',
+    'status_approved' => 'Approuvé',
+    'status_denied' => 'Refusé',
+
+    'created_at' => 'Créé le',
+
+    'enumerator_last_name' => 'Nom de famille de l\'énumérateur',
+    'enumerator_first_name' => 'Prénom de l\'énumérateur',
+    'enumerator_whatsapp' => 'WhatsApp de l\'énumérateur',
+
+    'latitude' => 'Latitude',
+    'longitude' => 'Longitude',
+    'altitude' => 'Altitude',
+    'accuracy' => 'Précision',
+
+    'back_to_list' => 'Retour à la liste',
+
+];

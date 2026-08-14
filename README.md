@@ -1,61 +1,272 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Waima
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Project Overview
 
-## About Laravel
+**Waima** is a Laravel-based web application developed using **PHP** and **MySQL**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This README provides the basic technical information required for developers or server administrators to understand and deploy the existing Waima project.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+> This document is for deploying the existing project code. It does not cover fresh Laravel installation or project development setup.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Technology Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Framework:** Laravel
+- **Backend:** PHP
+- **Database:** MySQL / MariaDB
+- **Web Server:** Apache or Nginx
+- **Dependency Manager:** Composer
+- **Frontend:** HTML, CSS, JavaScript (as used by the project)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Basic Project Structure
 
-## Laravel Sponsors
+```text
+waima/
+├── app/                 # Application logic
+├── bootstrap/           # Laravel bootstrap files
+├── config/              # Application configuration
+├── database/            # Migrations, seeders and factories
+├── public/              # Public web root
+├── resources/           # Views and frontend resources
+├── routes/              # Application routes
+├── storage/             # Logs, cache and generated files
+├── vendor/              # Composer dependencies
+├── .env                 # Environment configuration
+├── artisan              # Laravel command-line tool
+└── composer.json        # PHP dependency configuration
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## Server Requirements
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Recommended production environment:
 
-## Contributing
+- PHP 8.0 or higher
+- MySQL 5.7+ / MariaDB
+- Apache or Nginx
+- Composer
+- SSL certificate / HTTPS
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Required PHP extensions should include:
 
-## Code of Conduct
+- OpenSSL
+- PDO
+- Mbstring
+- Tokenizer
+- XML
+- Ctype
+- JSON
+- BCMath
+- Fileinfo
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Environment Configuration
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+The application uses the Laravel `.env` file for environment-specific settings.
 
-## License
+Example:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```env
+APP_NAME=Waima
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://yourdomain.com
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=your_database
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+The actual `.env` file should contain the credentials and settings for the target server.
+
+**Important:** Never expose the `.env` file publicly or commit production credentials to Git.
+
+---
+
+## Deployment Summary
+
+For direct deployment of the existing Waima code:
+
+1. Upload the complete project files to the server.
+2. Configure the `.env` file.
+3. Create/configure the MySQL database.
+4. Import the project database if an SQL backup is provided.
+5. Ensure Composer dependencies are available.
+6. Point the domain/document root to:
+   ```text
+   /waima/public
+   ```
+7. Set write permissions for:
+   ```text
+   storage/
+   bootstrap/cache/
+   ```
+8. Configure PHP and the web server.
+9. Clear/cache Laravel configuration as required.
+10. Test the application and review Laravel logs if needed.
+
+---
+
+## PHP Configuration
+
+The PHP configuration should support the application's expected resource requirements.
+
+Typical production settings:
+
+```ini
+memory_limit = 512M
+upload_max_filesize = 50M
+post_max_size = 50M
+max_execution_time = 300
+```
+
+The exact values may be adjusted according to server capacity and application requirements.
+
+---
+
+## Database
+
+Waima uses MySQL/MariaDB.
+
+Before making the application live:
+
+- Create the production database.
+- Create a dedicated database user.
+- Grant the required permissions.
+- Update the database details in `.env`.
+- Import the supplied database backup, if applicable.
+
+---
+
+## Web Root
+
+For security, the web server should point to the Laravel `public` directory rather than the project root.
+
+Example:
+
+```text
+/var/www/html/waima/public
+```
+
+Do not expose application directories such as `app`, `config`, `storage`, or `.env` directly through the web server.
+
+---
+
+## Permissions
+
+Laravel needs write access to:
+
+```text
+storage/
+bootstrap/cache/
+```
+
+Example:
+
+```bash
+chmod -R 775 storage
+chmod -R 775 bootstrap/cache
+```
+
+Permissions should be adjusted according to the server's web-server user and security policy.
+
+---
+
+## Laravel Cache
+
+After changing the production `.env` configuration, the Laravel configuration/cache may need to be refreshed:
+
+```bash
+php artisan config:clear
+php artisan cache:clear
+php artisan config:cache
+```
+
+If appropriate for the project, routes and views can also be cached:
+
+```bash
+php artisan route:cache
+php artisan view:cache
+```
+
+---
+
+## Storage
+
+If the application uses Laravel's public storage system, create the storage link:
+
+```bash
+php artisan storage:link
+```
+
+---
+
+## Logs
+
+Laravel application logs are normally located at:
+
+```text
+storage/logs/laravel.log
+```
+
+For a production issue, check:
+
+- Laravel logs
+- PHP error logs
+- Apache/Nginx logs
+- MySQL logs
+- Server permissions
+
+---
+
+## Production Checklist
+
+Before going live, verify:
+
+- [ ] PHP version is compatible
+- [ ] Required PHP extensions are enabled
+- [ ] MySQL database is configured
+- [ ] `.env` is configured
+- [ ] `APP_DEBUG=false`
+- [ ] `APP_KEY` is present
+- [ ] Domain points to `/public`
+- [ ] `storage` is writable
+- [ ] `bootstrap/cache` is writable
+- [ ] HTTPS is enabled
+- [ ] Database backup is available
+- [ ] Application loads successfully
+- [ ] Login and major application functions have been tested
+
+---
+
+## Maintenance
+
+For future deployments or code updates:
+
+1. Take a database backup.
+2. Upload/deploy the new code.
+3. Update dependencies if required.
+4. Verify `.env` is preserved.
+5. Clear/rebuild Laravel caches.
+6. Check permissions.
+7. Test the application.
+8. Review logs.
+
+---
+
+## Project Information
+
+**Project:** Waima  
+**Framework:** Laravel  
+**Language:** PHP  
+**Database:** MySQL / MariaDB  
+**Deployment Type:** Existing code / production deployment
+
